@@ -1,2 +1,2 @@
 # NetworkTechnologies
-labs
+5th semester labs
