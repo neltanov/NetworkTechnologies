@@ -1,12 +1,9 @@
 # NetworkTechnologies
-# Selfdetector
+# Selfdetector User Guide
 
-Linux Ubuntu User Guide (to be updated to with CMake):
-
-Firstly you need to install Boost:
+Firstly you need to install Boost. \
 For Linux Ubuntu:
 1) sudo apt-get install libboost-all-dev
-2) всё
 
 For Windows:
 1) Download boost archive from https://www.boost.org/
@@ -19,13 +16,13 @@ For Windows:
 
 Building a project with CMake (you are in selfdetecting path):
 
-cd build
-cmake ..
-cmake --build .
+1) cd build
+2) cmake ..
+3) cmake --build .
 
-Launch: 
-./selfdetecting <multicact_address> <port> <unique_identifier>
+Launch: \
+./selfdetecting <multicact_address> <port> <unique_identifier> \
 
-<multicast_address> - for IPv4 addresses: from 224.0.0.0 to 239.255.255.255
-<port>              - from 1024 to 49151
-<unique_identifier> - any identifier of your copy
+<multicast_address> - for IPv4 addresses: from 224.0.0.0 to 239.255.255.255 \
+<port>              - from 1024 to 49151 \
+<unique_identifier> - any identifier of your copy \
