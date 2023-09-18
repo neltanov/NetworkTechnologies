@@ -23,8 +23,8 @@ Building a project with CMake (you are in selfdetecting path):
 Launch: \
 ./selfdetecting <multicact_address> <port> <unique_identifier>
 
-<multicast_address> \
+multicast_address \
     - for IPv4 addresses: from 224.0.0.0 to 239.255.255.255 \
-    - for IPv6 addresses: adresses which begins with FF00::
-<port>              - from 1024 to 49151 \
-<unique_identifier> - any identifier of your copy
+    - for IPv6 addresses: adresses which begins with FF00:: \
+port              - from 1024 to 49151 \
+unique_identifier - any identifier of your copy
