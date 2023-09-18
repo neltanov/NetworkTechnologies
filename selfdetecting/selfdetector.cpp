@@ -14,33 +14,31 @@ public:
     MulticastSender(io_service& io_service,
                     const ip::address& multicast_address,
                     unsigned short multicast_port,
-                    const string& unique_identifier)
+                    const string unique_id)
         : socket_(io_service),
-          multicast_endpoint_(multicast_address, multicast_port),
-          timer_(io_service),
-          unique_identifier_(unique_identifier) {
-        // Открываем соксет для отправки multicast сообщений
-        socket_.open(multicast_endpoint_.protocol());
+          multicast_endpoint(multicast_address, multicast_port),
+          timer(io_service),
+          unique_identifier(unique_id) {
+        
+        socket_.open(multicast_endpoint.protocol());
 
-        // Запускаем таймер для отправки сообщений каждую секунду
-        timer_.expires_from_now(boost::posix_time::seconds(1));
-        timer_.async_wait(boost::bind(&MulticastSender::sendUdpMessage, this));
+        timer.expires_from_now(boost::posix_time::seconds(1));
+        timer.async_wait(boost::bind(&MulticastSender::sendUdpMessage, this));
     }
 
     void sendUdpMessage() {
-        string message = "Hello from " + unique_identifier_;
-        socket_.send_to(buffer(message), multicast_endpoint_);
+        string message = unique_identifier;
+        socket_.send_to(buffer(message), multicast_endpoint);
 
-        // Запускаем таймер снова для отправки следующего сообщения
-        timer_.expires_from_now(boost::posix_time::seconds(1));
-        timer_.async_wait(boost::bind(&MulticastSender::sendUdpMessage, this));
+        timer.expires_from_now(boost::posix_time::seconds(1));
+        timer.async_wait(boost::bind(&MulticastSender::sendUdpMessage, this));
     }
 
 private:
     udp::socket socket_;
-    udp::endpoint multicast_endpoint_;
-    string unique_identifier_;
-    deadline_timer timer_;
+    udp::endpoint multicast_endpoint;
+    string unique_identifier;
+    deadline_timer timer;
 };
 
 class MulticastReceiver {
@@ -48,26 +46,23 @@ public:
     MulticastReceiver(io_service& io_service,
                       const ip::address& multicast_address,
                       unsigned short multicast_port,
-                      const string& unique_identifier)
+                      const string unique_id)
         : socket_(io_service),
-          multicast_endpoint_(multicast_address, multicast_port),
+          multicast_endpoint(multicast_address, multicast_port),
           activity_check_timer(io_service),
-          unique_identifier_(unique_identifier) {
-        // Открываем соксет для прослушивания multicast сообщений
-        socket_.open(multicast_endpoint_.protocol());
+          unique_identifier(unique_id) {
+
+        socket_.open(multicast_endpoint.protocol());
+        socket_.set_option(udp::socket::reuse_address(true));
         
         if (multicast_address.is_v4()) {
-            socket_.set_option(udp::socket::reuse_address(true));
             socket_.bind(udp::endpoint(ip::address_v4::any(), multicast_port));
         } else if (multicast_address.is_v6()) {
-            socket_.set_option(udp::socket::reuse_address(true));
             socket_.bind(udp::endpoint(ip::address_v6::any(), multicast_port));
         }
 
-        // Добавляем соксет к multicast-группе
         socket_.set_option(multicast::join_group(multicast_address));
 
-        // Запускаем асинхронный прием сообщений
         startReceive();
 
         startActivityCheckTimer();
@@ -75,7 +70,7 @@ public:
 
     void printLiveCopies() {
         cout << "Live copies:" << endl;
-        for (const auto& address : live_copies_) {
+        for (const auto& address : live_copies) {
             cout << address.to_string() << endl;
         }
     }
@@ -83,24 +78,21 @@ public:
 private:
     void startReceive() {
         socket_.async_receive_from(
-            buffer(recv_buffer_),
-            remote_endpoint_,
+            buffer(recv_buffer),
+            remote_endpoint,
             boost::bind(&MulticastReceiver::handleReceive, this, _1, _2));
     }
 
     void handleReceive(const boost::system::error_code& error, size_t bytes_received) {
         if (!error) {
-            string received_message(recv_buffer_.data(), bytes_received);
-            string sender_identifier = received_message.substr(11); // Убираем "Hello from "
+            string received_message(recv_buffer.data(), bytes_received);
+            string sender_identifier = received_message;
 
-            if (sender_identifier != unique_identifier_) {
-                // cout << "Received message: " << received_message << " from "
-                //           << remote_endpoint_.address().to_string() << endl;
-                
-                // Добавляем адрес копии в список живых копий
-                lock_guard<mutex> lock(mutex_);
-                live_copies_.insert(remote_endpoint_.address());
+            cout << "Received message: " << received_message << " from "
+                          << remote_endpoint.address().to_string() << endl;
 
+            if (sender_identifier == unique_identifier) {
+                live_copies.insert(remote_endpoint.address());
                 printLiveCopies();
             }
 
@@ -108,14 +100,14 @@ private:
         } else {
             cerr << "Error receiving UDP message: " << error.message() << endl;
 
-            printLiveCopies();
+            // printLiveCopies();
             startActivityCheckTimer();
             startReceive();
         }
     }
 
     void startActivityCheckTimer() {
-        activity_check_timer.expires_from_now(boost::posix_time::seconds(10)); // Проверяем каждые 10 секунд
+        activity_check_timer.expires_from_now(boost::posix_time::seconds(3));
         activity_check_timer.async_wait(boost::bind(&MulticastReceiver::checkActivity, this));
     }
 
@@ -128,31 +120,29 @@ private:
         auto now = boost::posix_time::second_clock::universal_time();
         set<address> inactive_copies;
 
-        for (const auto& address : live_copies_) {
-            if (now - last_activity_[address] > boost::posix_time::seconds(10)) {
-                // Если копия не была активной в течение 10 секунд, считаем ее неактивной
+        for (const auto& address : live_copies) {
+            if (now - last_activity[address] > boost::posix_time::seconds(3)) {
                 inactive_copies.insert(address);
             }
         }
 
         for (const auto& address : inactive_copies) {
-            live_copies_.erase(address);
-            last_activity_.erase(address);
+            live_copies.erase(address);
+            last_activity.erase(address);
             cout << "Removed inactive copy: " << address.to_string() << endl;
         }
-        printLiveCopies();
+        // printLiveCopies();
     }
 
 private:
     udp::socket socket_;
-    udp::endpoint multicast_endpoint_;
-    udp::endpoint remote_endpoint_;
-    array<char, 1024> recv_buffer_;
-    string unique_identifier_;
-    set<address> live_copies_;
-    map<address, boost::posix_time::ptime> last_activity_;
+    udp::endpoint multicast_endpoint;
+    udp::endpoint remote_endpoint;
+    array<char, 1024> recv_buffer;
+    string unique_identifier;
+    set<address> live_copies;
+    map<address, boost::posix_time::ptime> last_activity;
     deadline_timer activity_check_timer;
-    mutex mutex_;
 };
 
 int main(int argc, char* argv[]) {
