@@ -1,4 +1,3 @@
-# NetworkTechnologies
 # Selfdetector User Guide
 
 Firstly you need to install Boost. \
