@@ -1,1 +1,0 @@
-/usr/bin/c++ CMakeFiles/selfdetecting.dir/src/backend/selfdetector.cpp.o CMakeFiles/corelib.dir/src/backend/multicast_sender.cpp.o CMakeFiles/corelib.dir/src/backend/multicast_receiver.cpp.o -o selfdetecting 
