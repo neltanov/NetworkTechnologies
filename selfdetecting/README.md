@@ -21,7 +21,7 @@ Building a project with CMake (you are in selfdetecting path):
 3) cmake --build .
 
 Launch: \
-./selfdetecting <multicact_address> <port> <unique_identifier>
+./selfdetecting <multicact_address> <your_port> <unique_identifier>
 
 multicast_address \
     - for IPv4 addresses: from 224.0.0.0 to 239.255.255.255 \
