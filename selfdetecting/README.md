@@ -20,7 +20,7 @@ Building a project with CMake (you are in selfdetecting path):
 2) cmake ..
 3) cmake --build .
 
-Launch: \
+Run: \
 ./selfdetecting <multicact_address> <your_port> <unique_identifier>
 
 multicast_address \
