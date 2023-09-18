@@ -16,7 +16,7 @@ For Windows:
 
 Building a project with CMake (you are in selfdetecting path):
 
-1) cd build
+1) mkdir build && cd build
 2) cmake ..
 3) cmake --build .
 
