@@ -6,8 +6,8 @@ MulticastReceiver::MulticastReceiver(io_service& io_service,
                       const string unique_id)
     : socket_(io_service),
         multicast_endpoint(multicast_address, multicast_port),
-        activity_check_timer(io_service),
-        unique_identifier(unique_id) {
+        unique_identifier(unique_id),
+        activity_check_timer(io_service) {
 
     socket_.open(multicast_endpoint.protocol());
     socket_.set_option(udp::socket::reuse_address(true));
