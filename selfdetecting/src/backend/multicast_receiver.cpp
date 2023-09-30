@@ -25,12 +25,6 @@ MulticastReceiver::MulticastReceiver(io_service& io_service,
     startActivityCheckTimer();
 }
 
-void MulticastReceiver::printLiveCopies() {
-    cout << "Live copies:" << endl;
-    for (const auto& address : live_copies) {
-        cout << address.to_string() << endl;
-    }
-}
 
 void MulticastReceiver::startReceive() {
     socket_.async_receive_from(
@@ -43,13 +37,20 @@ void MulticastReceiver::handleReceive(const boost::system::error_code& error, si
     if (!error) {
         string received_message(recv_buffer.data(), bytes_received);
         string sender_identifier = received_message;
-
+        
         cout << "Received message: " << received_message << " from "
-                        << remote_endpoint.address().to_string() << endl;
+                        << remote_endpoint.address().to_string() << ":" << remote_endpoint.port() << endl;
 
         if (sender_identifier == unique_identifier) {
-            live_copies.insert(remote_endpoint.address());
-            printLiveCopies();
+            bool is_inserted = live_copies.insert(remote_endpoint).second;
+            if (is_inserted) {
+                cout << "New copy: " << remote_endpoint.address().to_string() << ":" << remote_endpoint.port() << endl;
+                last_activity.insert(pair(remote_endpoint, boost::posix_time::second_clock::universal_time()));
+                printLiveCopies();
+            }
+            else {
+                last_activity[remote_endpoint] = boost::posix_time::second_clock::universal_time();
+            }
         }
 
         startReceive();
@@ -61,7 +62,7 @@ void MulticastReceiver::handleReceive(const boost::system::error_code& error, si
 }
 
 void MulticastReceiver::startActivityCheckTimer() {
-    activity_check_timer.expires_from_now(boost::posix_time::seconds(3));
+    activity_check_timer.expires_from_now(boost::posix_time::seconds(4));
     activity_check_timer.async_wait(boost::bind(&MulticastReceiver::checkActivity, this));
 }
 
@@ -72,18 +73,30 @@ void MulticastReceiver::checkActivity() {
 
 void MulticastReceiver::removeInactiveCopies() {
     auto now = boost::posix_time::second_clock::universal_time();
-    set<address> inactive_copies;
+    set<udp::endpoint> inactive_copies;
 
-    for (const auto& address : live_copies) {
-        if (now - last_activity[address] > boost::posix_time::seconds(3)) {
-            inactive_copies.insert(address);
+    for (const auto& endpoint : live_copies) {
+        if (now - last_activity[endpoint] > boost::posix_time::seconds(4)) {
+            inactive_copies.insert(endpoint);
         }
     }
 
-    for (const auto& address : inactive_copies) {
-        live_copies.erase(address);
-        last_activity.erase(address);
-        cout << "Removed inactive copy: " << address.to_string() << endl;
+    size_t n_erased = 0;
+
+    for (const auto& endpoint : inactive_copies) {
+        n_erased = live_copies.erase(endpoint);
+        last_activity.erase(endpoint);
+        cout << "Removed inactive copy: " << endpoint.address().to_string() << ":" << endpoint.port() << endl;
     }
-    printLiveCopies();
+
+    if (n_erased != 0) {
+        printLiveCopies();
+    }
+}
+
+void MulticastReceiver::printLiveCopies() {
+    cout << "Current copies:" << endl;
+    for (const auto& endpoint : live_copies) {
+        cout << endpoint.address().to_string() << ":" << endpoint.port() << endl;
+    }
 }

@@ -33,8 +33,8 @@ private:
     udp::endpoint remote_endpoint;
     array<char, 1024> recv_buffer;
     string unique_identifier;
-    set<address> live_copies;
-    map<address, boost::posix_time::ptime> last_activity;
+    set<udp::endpoint> live_copies;
+    map<udp::endpoint, boost::posix_time::ptime> last_activity;
     deadline_timer activity_check_timer;
 };
 
