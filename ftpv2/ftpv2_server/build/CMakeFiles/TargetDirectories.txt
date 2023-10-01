@@ -1,0 +1,4 @@
+/home/nelta/net_tech/ftpv2/ftpv2_server/build/CMakeFiles/corelib.dir
+/home/nelta/net_tech/ftpv2/ftpv2_server/build/CMakeFiles/ftpv2_server.dir
+/home/nelta/net_tech/ftpv2/ftpv2_server/build/CMakeFiles/edit_cache.dir
+/home/nelta/net_tech/ftpv2/ftpv2_server/build/CMakeFiles/rebuild_cache.dir

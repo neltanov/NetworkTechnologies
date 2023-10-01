@@ -1,15 +1,5 @@
-#include <iostream>
-#include <vector>
-#include <boost/asio.hpp>
-#include <boost/bind/bind.hpp>
-#include <boost/thread.hpp>
 #include "../include/multicast_receiver.h"
 #include "../include/multicast_sender.h"
-
-using namespace std;
-using namespace boost::asio;
-using namespace boost::asio::ip;
-using namespace boost::placeholders;
 
 int main(int argc, char* argv[]) {
     if (argc != 4) {
