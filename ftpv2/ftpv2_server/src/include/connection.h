@@ -23,7 +23,7 @@ public:
     void start();
 
 private:
-    TCPConnection(io_service& io_service);
+    TCPConnection(io_context& io_context);
     void handle_write(/* const boost::system::error_code& e, size_t bytes_transferred */);
 
     tcp::socket socket_;

@@ -1,6 +1,11 @@
 #include "../include/multicast_receiver.h"
 #include "../include/multicast_sender.h"
 
+using namespace std;
+using namespace boost::asio;
+using namespace boost::asio::ip;
+using namespace boost::placeholders;
+
 int main(int argc, char* argv[]) {
     if (argc != 4) {
         cerr << "Usage: " << argv[0] << " <multicast_address> <multicast_port> <unique_identifier>" << endl;

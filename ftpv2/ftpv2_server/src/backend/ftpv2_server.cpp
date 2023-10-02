@@ -9,11 +9,13 @@ FTPv4Server::FTPv4Server(boost::asio::io_context& io_context,
 }
 
 void FTPv4Server::startAccept() {
+    std::cout << "Server started accepting connections" << std::endl;
     TCPConnection::pointer new_connection = TCPConnection::create(io_context);
     acceptor.async_accept(new_connection->socket(), boost::bind(&FTPv4Server::handleAccept, this, new_connection, boost::asio::placeholders::error));
 }
 
 void FTPv4Server::handleAccept(TCPConnection::pointer new_connection, const boost::system::error_code &error) {
+    std::cout << "Starting to handle new connection" << std::endl;
     if (!error) {
         new_connection->start();
     }

@@ -1,5 +1,10 @@
 #include "../include/multicast_sender.h"
 
+using namespace std;
+using namespace boost::asio;
+using namespace boost::asio::ip;
+using namespace boost::placeholders;
+
 MulticastSender::MulticastSender(io_context& io_context,
                     const ip::address& multicast_address,
                     unsigned short multicast_port,
