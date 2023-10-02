@@ -14,7 +14,7 @@ using namespace boost::placeholders;
 
 class MulticastReceiver {
 public:
-    MulticastReceiver(io_service& io_service,
+    MulticastReceiver(io_context& io_context,
                       const ip::address& multicast_address,
                       unsigned short multicast_port,
                       const string unique_id);

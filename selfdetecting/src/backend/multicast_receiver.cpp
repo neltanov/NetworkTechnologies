@@ -1,13 +1,13 @@
 #include "../include/multicast_receiver.h"
 
-MulticastReceiver::MulticastReceiver(io_service& io_service,
+MulticastReceiver::MulticastReceiver(io_context& io_context,
                       const ip::address& multicast_address,
                       unsigned short multicast_port,
                       const string unique_id)
-    : socket_(io_service),
+    : socket_(io_context),
         multicast_endpoint(multicast_address, multicast_port),
         unique_identifier(unique_id),
-        activity_check_timer(io_service) {
+        activity_check_timer(io_context) {
 
     socket_.open(multicast_endpoint.protocol());
     socket_.set_option(udp::socket::reuse_address(true));

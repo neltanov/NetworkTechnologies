@@ -16,8 +16,7 @@ int main(int argc, char* argv[]) {
         boost::asio::io_context io_context;
 
         tcp::resolver resolver(io_context);
-        tcp::resolver::results_type endpoints =
-        resolver.resolve(argv[1], "daytime");
+        tcp::resolver::results_type endpoints = resolver.resolve(argv[1], "daytime");
 
         tcp::socket socket(io_context);
         boost::asio::connect(socket, endpoints);
@@ -29,9 +28,9 @@ int main(int argc, char* argv[]) {
             size_t len = socket.read_some(boost::asio::buffer(buf), error);
 
             if (error == boost::asio::error::eof)
-                break; // Connection closed cleanly by peer.
+                break;
             else if (error)
-                throw boost::system::system_error(error); // Some other error.
+                throw boost::system::system_error(error);
 
             cout.write(buf.data(), len);
         }

@@ -1,13 +1,13 @@
 #include "../include/multicast_sender.h"
 
-MulticastSender::MulticastSender(io_service& io_service,
+MulticastSender::MulticastSender(io_context& io_context,
                     const ip::address& multicast_address,
                     unsigned short multicast_port,
                     const string unique_id)
-    :   socket_(io_service),
+    :   socket_(io_context),
         multicast_endpoint(multicast_address, multicast_port),
         unique_identifier(unique_id),
-        timer(io_service) {
+        timer(io_context) {
     
     socket_.open(multicast_endpoint.protocol());
 
