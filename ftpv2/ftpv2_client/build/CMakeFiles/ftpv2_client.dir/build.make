@@ -92,6 +92,8 @@ ftpv2_client_EXTERNAL_OBJECTS =
 
 ftpv2_client: CMakeFiles/ftpv2_client.dir/src/backend/main.cpp.o
 ftpv2_client: CMakeFiles/ftpv2_client.dir/build.make
+ftpv2_client: /usr/lib/x86_64-linux-gnu/libboost_filesystem.so.1.74.0
+ftpv2_client: /usr/lib/x86_64-linux-gnu/libboost_system.so.1.74.0
 ftpv2_client: CMakeFiles/ftpv2_client.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/nelta/net_tech/ftpv2/ftpv2_client/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable ftpv2_client"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/ftpv2_client.dir/link.txt --verbose=$(VERBOSE)

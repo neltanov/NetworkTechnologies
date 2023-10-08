@@ -17,7 +17,9 @@ else()
     add_compile_options(-Wall -Wextra -pedantic -Werror)
 endif()
 
+find_package(Boost REQUIRED COMPONENTS filesystem system)
+
 # add_library(corelib OBJECT src/backend/multicast_sender.cpp src/backend/multicast_receiver.cpp)
 
 add_executable(${FTPv2_client} src/backend/main.cpp)
-# target_link_libraries(${FTPv2_client} corelib)
+target_link_libraries(${FTPv2_client} Boost::filesystem Boost::system)
