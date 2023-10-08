@@ -142,30 +142,6 @@ ftpv2_server/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ftpv2_server.dir/build.make CMakeFiles/ftpv2_server.dir/build
 .PHONY : ftpv2_server/fast
 
-src/backend/connection.o: src/backend/connection.cpp.o
-.PHONY : src/backend/connection.o
-
-# target to build an object file
-src/backend/connection.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/corelib.dir/build.make CMakeFiles/corelib.dir/src/backend/connection.cpp.o
-.PHONY : src/backend/connection.cpp.o
-
-src/backend/connection.i: src/backend/connection.cpp.i
-.PHONY : src/backend/connection.i
-
-# target to preprocess a source file
-src/backend/connection.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/corelib.dir/build.make CMakeFiles/corelib.dir/src/backend/connection.cpp.i
-.PHONY : src/backend/connection.cpp.i
-
-src/backend/connection.s: src/backend/connection.cpp.s
-.PHONY : src/backend/connection.s
-
-# target to generate assembly for a file
-src/backend/connection.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/corelib.dir/build.make CMakeFiles/corelib.dir/src/backend/connection.cpp.s
-.PHONY : src/backend/connection.cpp.s
-
 src/backend/ftpv2_server.o: src/backend/ftpv2_server.cpp.o
 .PHONY : src/backend/ftpv2_server.o
 
@@ -224,9 +200,6 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... corelib"
 	@echo "... ftpv2_server"
-	@echo "... src/backend/connection.o"
-	@echo "... src/backend/connection.i"
-	@echo "... src/backend/connection.s"
 	@echo "... src/backend/ftpv2_server.o"
 	@echo "... src/backend/ftpv2_server.i"
 	@echo "... src/backend/ftpv2_server.s"

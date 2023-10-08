@@ -1,6 +1,4 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/corelib.dir/src/backend/connection.cpp.o"
-  "CMakeFiles/corelib.dir/src/backend/connection.cpp.o.d"
   "CMakeFiles/corelib.dir/src/backend/ftpv2_server.cpp.o"
   "CMakeFiles/corelib.dir/src/backend/ftpv2_server.cpp.o.d"
 )

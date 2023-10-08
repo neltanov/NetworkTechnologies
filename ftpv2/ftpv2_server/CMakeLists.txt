@@ -17,7 +17,7 @@ else()
     add_compile_options(-Wall -Wextra -pedantic -Werror)
 endif()
 
-add_library(corelib OBJECT src/backend/ftpv2_server.cpp src/backend/connection.cpp)
+add_library(corelib OBJECT src/backend/ftpv2_server.cpp)
 
 add_executable(${FTPv2_server} src/backend/main.cpp)
 target_link_libraries(${FTPv2_server} corelib)

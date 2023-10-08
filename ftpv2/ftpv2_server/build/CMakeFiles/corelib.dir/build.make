@@ -83,22 +83,7 @@ CMakeFiles/corelib.dir/src/backend/ftpv2_server.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/corelib.dir/src/backend/ftpv2_server.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/nelta/net_tech/ftpv2/ftpv2_server/src/backend/ftpv2_server.cpp -o CMakeFiles/corelib.dir/src/backend/ftpv2_server.cpp.s
 
-CMakeFiles/corelib.dir/src/backend/connection.cpp.o: CMakeFiles/corelib.dir/flags.make
-CMakeFiles/corelib.dir/src/backend/connection.cpp.o: ../src/backend/connection.cpp
-CMakeFiles/corelib.dir/src/backend/connection.cpp.o: CMakeFiles/corelib.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/nelta/net_tech/ftpv2/ftpv2_server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/corelib.dir/src/backend/connection.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/corelib.dir/src/backend/connection.cpp.o -MF CMakeFiles/corelib.dir/src/backend/connection.cpp.o.d -o CMakeFiles/corelib.dir/src/backend/connection.cpp.o -c /home/nelta/net_tech/ftpv2/ftpv2_server/src/backend/connection.cpp
-
-CMakeFiles/corelib.dir/src/backend/connection.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/corelib.dir/src/backend/connection.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/nelta/net_tech/ftpv2/ftpv2_server/src/backend/connection.cpp > CMakeFiles/corelib.dir/src/backend/connection.cpp.i
-
-CMakeFiles/corelib.dir/src/backend/connection.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/corelib.dir/src/backend/connection.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/nelta/net_tech/ftpv2/ftpv2_server/src/backend/connection.cpp -o CMakeFiles/corelib.dir/src/backend/connection.cpp.s
-
 corelib: CMakeFiles/corelib.dir/src/backend/ftpv2_server.cpp.o
-corelib: CMakeFiles/corelib.dir/src/backend/connection.cpp.o
 corelib: CMakeFiles/corelib.dir/build.make
 .PHONY : corelib
 

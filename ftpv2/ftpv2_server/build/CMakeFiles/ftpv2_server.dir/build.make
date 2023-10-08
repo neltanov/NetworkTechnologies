@@ -89,12 +89,10 @@ ftpv2_server_OBJECTS = \
 
 # External object files for target ftpv2_server
 ftpv2_server_EXTERNAL_OBJECTS = \
-"/home/nelta/net_tech/ftpv2/ftpv2_server/build/CMakeFiles/corelib.dir/src/backend/ftpv2_server.cpp.o" \
-"/home/nelta/net_tech/ftpv2/ftpv2_server/build/CMakeFiles/corelib.dir/src/backend/connection.cpp.o"
+"/home/nelta/net_tech/ftpv2/ftpv2_server/build/CMakeFiles/corelib.dir/src/backend/ftpv2_server.cpp.o"
 
 ftpv2_server: CMakeFiles/ftpv2_server.dir/src/backend/main.cpp.o
 ftpv2_server: CMakeFiles/corelib.dir/src/backend/ftpv2_server.cpp.o
-ftpv2_server: CMakeFiles/corelib.dir/src/backend/connection.cpp.o
 ftpv2_server: CMakeFiles/ftpv2_server.dir/build.make
 ftpv2_server: CMakeFiles/ftpv2_server.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/nelta/net_tech/ftpv2/ftpv2_server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable ftpv2_server"

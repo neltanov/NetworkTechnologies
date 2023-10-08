@@ -13,7 +13,7 @@ int main(int argc, char* argv[]) {
         unsigned short server_port = atoi(argv[1]);
 
         boost::asio::io_context io_context;
-        FTPv4Server(io_context, server_port);
+        FTPv2Server(io_context, server_port);
         io_context.run();
     }
     catch (std::exception& e) {

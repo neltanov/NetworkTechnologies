@@ -8,32 +8,48 @@ using namespace boost::asio::ip;
 
 int main(int argc, char* argv[]) {
     try {
-        if (argc != 2) {
-            cerr << "Usage: client <host>" << endl;
+        if (argc != 3) {
+            cerr << "Usage: " << argv[0] << " <server_address> <server_port>" << endl;
             return 1;
         }
 
         boost::asio::io_context io_context;
 
         tcp::resolver resolver(io_context);
-        tcp::resolver::results_type endpoints = resolver.resolve(argv[1], "daytime");
-
         tcp::socket socket(io_context);
+
+        tcp::resolver::results_type endpoints = resolver.resolve(argv[1], argv[2]);
+
         boost::asio::connect(socket, endpoints);
 
-        while (1) {
-            boost::array<char, 128> buf;
-            boost::system::error_code error;
+        socket.close();
+        // string message = "Hello, server!";
+        // boost::asio::write(socket, boost::asio::buffer(message));
 
-            size_t len = socket.read_some(boost::asio::buffer(buf), error);
+        // // Получаем ответ от сервера
+        // char buffer[128];
+        // boost::system::error_code error;
+        // size_t bytes_received = socket.read_some(boost::asio::buffer(buffer), error);
 
-            if (error == boost::asio::error::eof)
-                break;
-            else if (error)
-                throw boost::system::system_error(error);
+        // if (!error) {
+        //     cout << "Ответ от сервера: " << string(buffer, bytes_received) << endl;
+        // } else {
+        //     cerr << "Ошибка при получении ответа: " << error.message() << endl;
+        // }
 
-            cout.write(buf.data(), len);
-        }
+        // while (1) {
+        //     boost::array<char, 128> buf;
+        //     boost::system::error_code error;
+
+        //     size_t len = socket.read_some(boost::asio::buffer(buf), error);
+
+        //     if (error == boost::asio::error::eof)
+        //         break;
+        //     else if (error)
+        //         throw boost::system::system_error(error);
+
+        //     cout.write(buf.data(), len);
+        // }
     }
     catch (exception& e)
     {
