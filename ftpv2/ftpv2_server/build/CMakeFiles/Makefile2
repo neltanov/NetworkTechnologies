@@ -83,12 +83,12 @@ clean: CMakeFiles/ftpv2_server.dir/clean
 CMakeFiles/corelib.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/corelib.dir/build.make CMakeFiles/corelib.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/corelib.dir/build.make CMakeFiles/corelib.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/nelta/net_tech/ftpv2/ftpv2_server/build/CMakeFiles --progress-num=1 "Built target corelib"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/nelta/net_tech/ftpv2/ftpv2_server/build/CMakeFiles --progress-num=1,2 "Built target corelib"
 .PHONY : CMakeFiles/corelib.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/corelib.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/nelta/net_tech/ftpv2/ftpv2_server/build/CMakeFiles 1
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/nelta/net_tech/ftpv2/ftpv2_server/build/CMakeFiles 2
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/corelib.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/nelta/net_tech/ftpv2/ftpv2_server/build/CMakeFiles 0
 .PHONY : CMakeFiles/corelib.dir/rule
@@ -109,12 +109,12 @@ CMakeFiles/corelib.dir/clean:
 CMakeFiles/ftpv2_server.dir/all: CMakeFiles/corelib.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ftpv2_server.dir/build.make CMakeFiles/ftpv2_server.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ftpv2_server.dir/build.make CMakeFiles/ftpv2_server.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/nelta/net_tech/ftpv2/ftpv2_server/build/CMakeFiles --progress-num=2,3 "Built target ftpv2_server"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/nelta/net_tech/ftpv2/ftpv2_server/build/CMakeFiles --progress-num=3,4 "Built target ftpv2_server"
 .PHONY : CMakeFiles/ftpv2_server.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/ftpv2_server.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/nelta/net_tech/ftpv2/ftpv2_server/build/CMakeFiles 3
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/nelta/net_tech/ftpv2/ftpv2_server/build/CMakeFiles 4
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/ftpv2_server.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/nelta/net_tech/ftpv2/ftpv2_server/build/CMakeFiles 0
 .PHONY : CMakeFiles/ftpv2_server.dir/rule

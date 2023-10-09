@@ -13,9 +13,14 @@ FTPv2Server::FTPv2Server(int server_port)
 
 void FTPv2Server::start() {
     try {
+        // std::thread speedThread(&FTPv2Server::printSpeedInfo, this);
         while (true) {
             tcp::socket socket(io_context);
             acceptor.accept(socket);
+
+            // std::lock_guard<std::mutex> lock(clients_mutex);
+            // clients[&socket] = ClientInfo();
+
             std::thread(&FTPv2Server::handleConnection, this, std::move(socket)).detach();
         }
     } catch (const exception& e) {
@@ -71,8 +76,9 @@ void FTPv2Server::handleConnection(tcp::socket socket) {
         uint64_t remaining_bytes = file_size;
         boost::system::error_code ec;
         while (remaining_bytes > 0) {
-            size_t bufferSize = (remaining_bytes < sizeof(data)) ? remaining_bytes : sizeof(data);
-            bytes_read = read(socket, boost::asio::buffer(data, bufferSize), ec);
+            size_t buffer_size = (remaining_bytes < sizeof(data)) ? remaining_bytes : sizeof(data);
+            cout << "Buffer size: " << buffer_size << endl;
+            bytes_read = read(socket, boost::asio::buffer(data, buffer_size), ec);
 
             if (bytes_read == 0 || ec == error::eof) {
                 cerr << "EOF" << endl;
@@ -83,9 +89,10 @@ void FTPv2Server::handleConnection(tcp::socket socket) {
                 cerr << "Reading error: " << ec.message() << endl;
                 break;
             }
-
+            
             output_file.write(data, static_cast<streamsize>(bytes_read));
             total_bytes_read += bytes_read;
+
             remaining_bytes -= bytes_read;
         }
         cout << "Remaining bytes: " << remaining_bytes << endl;
@@ -108,4 +115,24 @@ void FTPv2Server::handleConnection(tcp::socket socket) {
         cerr << e.what() << endl;
     }
 
+}
+
+void FTPv2Server::printSpeedInfo() {
+    while (true) {
+        {
+            std::lock_guard<std::mutex> lock(clients_mutex);
+            for (const auto& pair : clients) {
+                const ip::tcp::socket* socket = pair.first;
+                const ClientInfo& info = pair.second;
+
+                double secondsElapsed = 3.0;
+                double currentSpeed = static_cast<double>(info.getTotalBytesReceived()) / secondsElapsed;
+
+                std::cout << "Client " << socket << ": ";
+                std::cout << "Current Speed: " << currentSpeed << " bytes/second" << std::endl;
+            }
+        }
+
+        std::this_thread::sleep_for(std::chrono::seconds(3));
+    }
 }

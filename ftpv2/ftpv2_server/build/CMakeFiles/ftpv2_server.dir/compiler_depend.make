@@ -1382,8 +1382,11 @@ CMakeFiles/ftpv2_server.dir/src/backend/main.cpp.o: ../src/backend/main.cpp \
   /usr/include/boost/filesystem/operations.hpp \
   /usr/include/boost/filesystem/convenience.hpp \
   /usr/include/boost/filesystem/string_file.hpp \
-  /usr/include/boost/filesystem/fstream.hpp
+  /usr/include/boost/filesystem/fstream.hpp \
+  ../src/include/client_info.h
 
+
+../src/include/client_info.h:
 
 /usr/include/boost/filesystem/fstream.hpp:
 

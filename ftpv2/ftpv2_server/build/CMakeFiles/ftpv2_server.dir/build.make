@@ -89,10 +89,12 @@ ftpv2_server_OBJECTS = \
 
 # External object files for target ftpv2_server
 ftpv2_server_EXTERNAL_OBJECTS = \
-"/home/nelta/net_tech/ftpv2/ftpv2_server/build/CMakeFiles/corelib.dir/src/backend/ftpv2_server.cpp.o"
+"/home/nelta/net_tech/ftpv2/ftpv2_server/build/CMakeFiles/corelib.dir/src/backend/ftpv2_server.cpp.o" \
+"/home/nelta/net_tech/ftpv2/ftpv2_server/build/CMakeFiles/corelib.dir/src/backend/client_info.cpp.o"
 
 ftpv2_server: CMakeFiles/ftpv2_server.dir/src/backend/main.cpp.o
 ftpv2_server: CMakeFiles/corelib.dir/src/backend/ftpv2_server.cpp.o
+ftpv2_server: CMakeFiles/corelib.dir/src/backend/client_info.cpp.o
 ftpv2_server: CMakeFiles/ftpv2_server.dir/build.make
 ftpv2_server: /usr/lib/x86_64-linux-gnu/libboost_filesystem.so.1.74.0
 ftpv2_server: /usr/lib/x86_64-linux-gnu/libboost_system.so.1.74.0

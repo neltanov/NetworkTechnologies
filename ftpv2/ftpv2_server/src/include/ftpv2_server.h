@@ -10,6 +10,8 @@
 #include <boost/filesystem.hpp>
 #include <boost/asio/detail/socket_ops.hpp>
 
+#include "client_info.h"
+
 using namespace std;
 using namespace boost::asio;
 using namespace boost::placeholders;
@@ -22,9 +24,12 @@ public:
 
 private:
     void handleConnection(tcp::socket socket);
+    void printSpeedInfo();
     
     boost::asio::io_context io_context;
     tcp::acceptor acceptor;
+    std::map<ip::tcp::socket*, ClientInfo> clients;
+    std::mutex clients_mutex;
 };
 
 #endif // FTPV4_SERVER_H

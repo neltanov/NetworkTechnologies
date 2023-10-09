@@ -1384,4 +1384,5 @@ CMakeFiles/ftpv2_server.dir/src/backend/main.cpp.o
  /usr/include/boost/filesystem/convenience.hpp
  /usr/include/boost/filesystem/string_file.hpp
  /usr/include/boost/filesystem/fstream.hpp
+ /home/nelta/net_tech/ftpv2/ftpv2_server/src/include/client_info.h
 

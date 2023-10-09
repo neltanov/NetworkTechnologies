@@ -1,1 +1,1 @@
-/usr/bin/c++ CMakeFiles/ftpv2_server.dir/src/backend/main.cpp.o CMakeFiles/corelib.dir/src/backend/ftpv2_server.cpp.o -o ftpv2_server  /usr/lib/x86_64-linux-gnu/libboost_filesystem.so.1.74.0 /usr/lib/x86_64-linux-gnu/libboost_system.so.1.74.0 
+/usr/bin/c++ CMakeFiles/ftpv2_server.dir/src/backend/main.cpp.o CMakeFiles/corelib.dir/src/backend/ftpv2_server.cpp.o CMakeFiles/corelib.dir/src/backend/client_info.cpp.o -o ftpv2_server  /usr/lib/x86_64-linux-gnu/libboost_filesystem.so.1.74.0 /usr/lib/x86_64-linux-gnu/libboost_system.so.1.74.0 

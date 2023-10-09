@@ -65,7 +65,7 @@ int main(int argc, char* argv[]) {
         } else {
             cerr << "Error: The file was not transferred to the server." << endl;
         }
-        sleep(30);
+
         socket.close();
     } catch (const exception& e) {
         cerr << e.what() << endl;
