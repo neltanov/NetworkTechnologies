@@ -73,5 +73,6 @@
         "variant": "cpp",
         "fstream": "cpp"
     },
-    "cmake.sourceDirectory": "/home/nelta/net_tech/selfdetecting"
+    "cmake.sourceDirectory": "/home/nelta/net_tech/selfdetecting",
+    "cmake.configureOnOpen": false
 }

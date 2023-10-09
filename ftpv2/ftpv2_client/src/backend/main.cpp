@@ -23,10 +23,12 @@ int main(int argc, char* argv[]) {
         tcp::endpoint server_endpoint(make_address(argv[2]), atoi(argv[3]));
         socket.connect(server_endpoint);
         
+        cout << "Connected to " << server_endpoint << endl;
+
         path file_path = argv[1];
 
-        std::string filename = file_path.filename().string();
-        boost::asio::write(socket, boost::asio::buffer(filename + '\n'));
+        string filename = file_path.filename().string();
+        write(socket, boost::asio::buffer(filename + '\n'));
 
         std::ifstream input_file(argv[1], ios::binary);
         if (!input_file.is_open()) {
@@ -35,26 +37,36 @@ int main(int argc, char* argv[]) {
         }
 
         input_file.seekg(0, ios::end);
-        streampos file_size = input_file.tellg();
+        uint64_t file_size = static_cast<uint64_t>(input_file.tellg());
         input_file.seekg(0, ios::beg);
         
-        cout << "File size: " << file_size << endl; // 13
+        cout << "File size: " << file_size << " bytes" << endl;
 
-        uint64_t file_size_network_order = boost::asio::detail::socket_ops::host_to_network_long(file_size);
-        boost::asio::write(socket, boost::asio::buffer(&file_size_network_order, sizeof(file_size_network_order)));
+        stringstream file_size_stream;
+        file_size_stream << file_size;
+        string file_size_str = file_size_stream.str();
 
-        const int buffer_size = 8192;
-        char buffer[buffer_size];
-        while (!input_file.eof()) {
-            // streamsize read_size = min(static_cast<streamsize>(buffer_size), static_cast<streamsize>(file_size));
-            input_file.read(buffer, buffer_size);
-            std::streamsize bytes_read = input_file.gcount();
-            socket.write_some(boost::asio::buffer(buffer, bytes_read));
+        write(socket, boost::asio::buffer(file_size_str + "\n"));
+        
+        char data[8192];
+        while (input_file) {
+            input_file.read(data, sizeof(data));
+            write(socket, boost::asio::buffer(data, input_file.gcount()));
         }
+        cout << "Remaining bytes: " << input_file.gcount() << endl;
+        boost::asio::streambuf response_buffer;
+        read_until(socket, response_buffer, '\n');
+        istream response_stream(&response_buffer);
+        string response;
+        getline(response_stream, response);
 
+        if (response == "Success") {
+            cout << "The file has been successfully transferred to the server." << endl;
+        } else {
+            cerr << "Error: The file was not transferred to the server." << endl;
+        }
+        sleep(30);
         socket.close();
-
-        cout << "The file has been successfully sent" << endl;
     } catch (const exception& e) {
         cerr << e.what() << endl;
     }
