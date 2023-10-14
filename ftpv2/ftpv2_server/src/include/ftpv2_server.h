@@ -25,11 +25,13 @@ public:
 private:
     void handleConnection(tcp::socket socket);
     void printSpeedInfo();
+    size_t readHandler(const boost::system::error_code &ec, std::size_t bytes_transferred);
     
     boost::asio::io_context io_context;
     tcp::acceptor acceptor;
     std::map<ip::tcp::socket*, ClientInfo> clients;
     std::mutex clients_mutex;
+    uint64_t file_size;
 };
 
 #endif // FTPV4_SERVER_H
