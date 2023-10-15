@@ -5,11 +5,11 @@ using namespace boost::asio;
 using namespace boost::placeholders;
 using namespace boost::filesystem;
 using boost::asio::ip::tcp;
-using namespace boost::placeholders;
 
 FTPv2Server::FTPv2Server(int server_port)
     :   io_context(),
-        acceptor(io_context, tcp::endpoint(tcp::v4(), server_port)) {
+        acceptor(io_context, tcp::endpoint(tcp::v4(), server_port)),
+        uploads_dir("uploads") {
 }
 
 void FTPv2Server::start() {
@@ -31,14 +31,9 @@ void FTPv2Server::start() {
 
 void FTPv2Server::handleConnection(tcp::socket socket) {
     try {
-        path uploads_dir("uploads");
-        if (!exists(uploads_dir)) {
-            create_directory(uploads_dir);
-        }
-
         cout << "New connection: " << socket.remote_endpoint() << endl;
+        create_directory(uploads_dir);
 
-        boost::system::error_code er_code;
         boost::asio::streambuf buffer_stream;
         string filename;
 
@@ -46,9 +41,7 @@ void FTPv2Server::handleConnection(tcp::socket socket) {
 
         istream filenameStream(&buffer_stream);
         getline(filenameStream, filename);
-        if (!filename.empty() && filename[filename.length() - 1] == '\n') {
-            filename.erase(filename.length() - 1);
-        }
+
         cout << "Filename: " << filename << endl;
         
         path file_path = uploads_dir / path(filename);
@@ -63,10 +56,13 @@ void FTPv2Server::handleConnection(tcp::socket socket) {
         istream string_stream(&buffer_stream);
         string file_size_str;
         getline(string_stream, file_size_str);
-        file_size = stoull(file_size_str);
+        cout << "In buffer remain " << buffer_stream.size() << endl;
+
+        uint64_t file_size = stoull(file_size_str);
         cout << "File size: " << file_size << " bytes" << endl;
 
-        write(socket, buffer("Ready\n"));
+        string ready_status = "Ready";
+        write(socket, buffer(ready_status + '\n'));
 
         char data[8192];
         uint64_t bytes_read = 0;
@@ -87,14 +83,17 @@ void FTPv2Server::handleConnection(tcp::socket socket) {
 
         cout << "File saved to " << file_path << endl;
         cout << "Bytes received: " << total_bytes_read << endl;
-        if (total_bytes_read == file_size) {
-            cout << "The file has been successfully transferred to the server." << endl;
-            write(socket, buffer("Success\n"));
-        } else {
-            cout << "Error: wrong transferred bytes" << endl;
-            write(socket, buffer("Failure\n"));
-        }
 
+        string read_status;
+        if (total_bytes_read == file_size) {
+            read_status = "Success";
+        } else {
+            read_status = "Failure";
+            boost::filesystem::remove(uploads_dir.string() + '/' + filename);
+        }
+        cout << "File transfrerring status: " << read_status << endl;
+        write(socket, buffer(read_status + '\n'));
+        
         cout << "Connection " << socket.remote_endpoint() << " is closed" << endl << endl;
         socket.close();
 
@@ -106,18 +105,16 @@ void FTPv2Server::handleConnection(tcp::socket socket) {
 
 void FTPv2Server::printSpeedInfo() {
     while (true) {
-        {
-            std::lock_guard<std::mutex> lock(clients_mutex);
-            for (const auto& pair : clients) {
-                const ip::tcp::socket* socket = pair.first;
-                const ClientInfo& info = pair.second;
+        std::lock_guard<std::mutex> lock(clients_mutex);
+        for (const auto& pair : clients) {
+            const ip::tcp::socket* socket = pair.first;
+            const ClientInfo& info = pair.second;
 
-                double secondsElapsed = 3.0;
-                double currentSpeed = static_cast<double>(info.getTotalBytesReceived()) / secondsElapsed;
+            double secondsElapsed = 3.0;
+            double currentSpeed = static_cast<double>(info.getTotalBytesReceived()) / secondsElapsed;
 
-                std::cout << "Client " << socket << ": ";
-                std::cout << "Current Speed: " << currentSpeed << " bytes/second" << std::endl;
-            }
+            std::cout << "Client " << socket << ": ";
+            std::cout << "Current Speed: " << currentSpeed << " bytes/second" << std::endl;
         }
 
         std::this_thread::sleep_for(std::chrono::seconds(3));

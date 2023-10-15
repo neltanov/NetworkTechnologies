@@ -9,13 +9,13 @@ project(ftpv2_server)
 # задаем имя исполняемого файла основной программы
 set(FTPv2_server ${PROJECT_NAME})
 
-# if (MSVC)
-#     # warning level 4 and all warnings as errors
-#     add_compile_options(/W4 /WX)
-# else()
-#     # lots of warnings and all warnings as errors
-#     add_compile_options(-Wall -Wextra -pedantic -Werror)
-# endif()
+if (MSVC)
+    # warning level 4 and all warnings as errors
+    add_compile_options(/W4 /WX)
+else()
+    # lots of warnings and all warnings as errors
+    add_compile_options(-Wall -Wextra -pedantic -Werror)
+endif()
 
 find_package(Boost REQUIRED COMPONENTS filesystem system)
 

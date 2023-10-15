@@ -17,9 +17,24 @@ int main(int argc, char* argv[]) {
             return 1;
         }
 
+        path file_path = argv[1];
+        string filename = file_path.filename().string();
+        if (filename.length() >= 4096) {
+            cerr << "Filename is too long" << endl;
+            return 1;
+        }
+
         std::ifstream input_file(argv[1], ios::binary);
         if (!input_file.is_open()) {
             cerr << "File opening failed" << endl;
+            return 1;
+        }
+
+        input_file.seekg(0, ios::end);
+        uint64_t file_size = static_cast<uint64_t>(input_file.tellg());
+        input_file.seekg(0, ios::beg);
+        if (file_size >= 1024LL * 1024 * 1024 * 1024) {
+            cerr << "File size is too big" << endl;
             return 1;
         }
 
@@ -30,36 +45,22 @@ int main(int argc, char* argv[]) {
         socket.connect(server_endpoint);
         
         cout << "Connected to " << server_endpoint << endl;
-
-        path file_path = argv[1];
-        
-        string filename = file_path.filename().string();
-        write(socket, buffer(filename + '\n'));
-
-        input_file.seekg(0, ios::end);
-        uint64_t file_size = static_cast<uint64_t>(input_file.tellg());
-        input_file.seekg(0, ios::beg);
-        
+        cout << "File name: " << filename << endl;
         cout << "File size: " << file_size << " bytes" << endl;
 
-        stringstream file_size_stream;
-        file_size_stream << file_size;
-        string file_size_str = file_size_stream.str();
-
-        write(socket, buffer(file_size_str + "\n"));
+        write(socket, buffer(filename + '\n'));
+        write(socket, buffer(to_string(file_size) + '\n'));
 
         boost::asio::streambuf response_buffer;
-        
-        read_until(socket, response_buffer, '\n');
         istream response_stream(&response_buffer);
         string response;
+        
+        read_until(socket, response_buffer, '\n');
         getline(response_stream, response);
 
-        if (response == "Ready") {
-            cout << "The server is ready to receive data" << endl;
-        } else {
+        if (response != "Ready") {
             cerr << "Error: the server is not ready to receive data." << endl;
-            return -1;
+            return 1;
         }
         
         char data[8192];
@@ -68,10 +69,8 @@ int main(int argc, char* argv[]) {
             write(socket, buffer(data, input_file.gcount()));
         }
 
-        boost::asio::streambuf success_response_buffer;
-        read_until(socket, success_response_buffer, '\n');
-        istream success_response_stream(&success_response_buffer);
-        getline(success_response_stream, response);
+        read_until(socket, response_buffer, '\n');
+        getline(response_stream, response);
 
         if (response == "Success") {
             cout << "The file has been successfully transferred to the server." << endl;

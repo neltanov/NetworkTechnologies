@@ -6,5 +6,5 @@ CXX_DEFINES = -DBOOST_ALL_NO_LIB -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_SYSTEM_DYN_
 
 CXX_INCLUDES = 
 
-CXX_FLAGS = -std=gnu++20
+CXX_FLAGS = -Wall -Wextra -pedantic -Werror -std=gnu++20
 

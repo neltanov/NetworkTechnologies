@@ -14,7 +14,7 @@
 
 using namespace std;
 using namespace boost::asio;
-using namespace boost::placeholders;
+using namespace boost::filesystem;
 using boost::asio::ip::tcp;
 
 class FTPv2Server {
@@ -25,13 +25,12 @@ public:
 private:
     void handleConnection(tcp::socket socket);
     void printSpeedInfo();
-    size_t readHandler(const boost::system::error_code &ec, std::size_t bytes_transferred);
     
     boost::asio::io_context io_context;
     tcp::acceptor acceptor;
-    std::map<ip::tcp::socket*, ClientInfo> clients;
-    std::mutex clients_mutex;
-    uint64_t file_size;
+    map<ip::tcp::socket*, ClientInfo> clients;
+    mutex clients_mutex;
+    path uploads_dir;
 };
 
 #endif // FTPV4_SERVER_H
