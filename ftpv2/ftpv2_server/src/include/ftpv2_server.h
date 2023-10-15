@@ -24,12 +24,9 @@ public:
 
 private:
     void handleConnection(tcp::socket socket);
-    void printSpeedInfo();
     
     boost::asio::io_context io_context;
     tcp::acceptor acceptor;
-    map<ip::tcp::socket*, ClientInfo> clients;
-    mutex clients_mutex;
     path uploads_dir;
 };
 

@@ -2,17 +2,27 @@
 #define CLIENT_INFO_H
 
 #include <iostream>
+#include <boost/asio.hpp>
+#include <boost/bind/bind.hpp>
+
+using namespace std;
+using namespace boost::asio;
 
 class ClientInfo {
 public:
     ClientInfo();
 
-    uint64_t getTotalBytesReceived() const;
+    size_t getTotalBytesReceived() const;
+    void addBytesReceived(size_t bytesRead);
 
-    void addBytesReceived(std::size_t bytesRead);
+    void speedCheck();
+    void startSpeedChecking();
+    void printSpeedInfo();
 
 private:
-    uint64_t totalBytesReceived;
+    io_context io;
+    deadline_timer timer;
+    size_t totalBytesReceived;
 };
 
 #endif // CLIENT_INFO_H
