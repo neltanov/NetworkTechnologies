@@ -17,9 +17,9 @@ else()
     add_compile_options(-Wall -Wextra -pedantic -Werror)
 endif()
 
-find_package(Boost REQUIRED COMPONENTS filesystem system)
+find_package(Boost REQUIRED COMPONENTS filesystem system timer)
 
 add_library(corelib OBJECT src/backend/ftpv2_server.cpp src/backend/client_info.cpp)
 
 add_executable(${FTPv2_server} src/backend/main.cpp)
-target_link_libraries(${FTPv2_server} corelib Boost::filesystem Boost::system)
+target_link_libraries(${FTPv2_server} corelib Boost::filesystem Boost::system Boost::timer)

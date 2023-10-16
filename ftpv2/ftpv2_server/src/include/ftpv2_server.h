@@ -24,6 +24,7 @@ public:
 
 private:
     void handleConnection(tcp::socket socket);
+    size_t handleReading(boost::system::error_code& ec, size_t bytes_transferred);
     
     boost::asio::io_context io_context;
     tcp::acceptor acceptor;

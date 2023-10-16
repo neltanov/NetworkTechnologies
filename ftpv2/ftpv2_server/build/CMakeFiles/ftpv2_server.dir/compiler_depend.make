@@ -1383,8 +1383,15 @@ CMakeFiles/ftpv2_server.dir/src/backend/main.cpp.o: ../src/backend/main.cpp \
   /usr/include/boost/filesystem/convenience.hpp \
   /usr/include/boost/filesystem/string_file.hpp \
   /usr/include/boost/filesystem/fstream.hpp \
-  ../src/include/client_info.h
+  ../src/include/client_info.h \
+  /usr/include/boost/timer/timer.hpp \
+  /usr/include/boost/config/warning_disable.hpp \
+  /usr/include/boost/timer/config.hpp
 
+
+/usr/include/boost/config/warning_disable.hpp:
+
+/usr/include/boost/timer/timer.hpp:
 
 ../src/include/client_info.h:
 
@@ -2345,6 +2352,8 @@ CMakeFiles/ftpv2_server.dir/src/backend/main.cpp.o: ../src/backend/main.cpp \
 /usr/include/boost/mpl/aux_/arity.hpp:
 
 /usr/include/c++/11/bits/ios_base.h:
+
+/usr/include/boost/timer/config.hpp:
 
 /usr/include/boost/mpl/bool_fwd.hpp:
 

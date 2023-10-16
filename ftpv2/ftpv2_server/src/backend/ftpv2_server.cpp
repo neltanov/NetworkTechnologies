@@ -37,8 +37,8 @@ void FTPv2Server::handleConnection(tcp::socket socket) {
 
         ClientInfo* client_info = new ClientInfo();
 
-        std::thread(&ClientInfo::speedCheck, client_info).detach();
-
+        std::thread speed_check_thread(&ClientInfo::speedCheck, client_info);
+        
         read_until(socket, buffer_stream, '\n');
 
         istream filenameStream(&buffer_stream);
@@ -66,32 +66,32 @@ void FTPv2Server::handleConnection(tcp::socket socket) {
         write(socket, buffer(ready_status + '\n'));
 
         char data[8192];
-        size_t bytes_read = 0;
-        size_t total_bytes_read = 0;
+        size_t bytes_received = 0;
+        size_t total_bytes_received = 0;
         size_t remaining_bytes = file_size;
         boost::system::error_code ec;
         
         while (remaining_bytes > 0) {
             size_t buffer_size = (remaining_bytes < sizeof(data)) ? remaining_bytes : sizeof(data);
-            bytes_read = read(socket, boost::asio::buffer(data, buffer_size));
+            bytes_received = read(socket, boost::asio::buffer(data, buffer_size)/* , boost::bind(&FTPv2Server::handleReading, this, _1, _2) */);
             
-            output_file.write(data, static_cast<streamsize>(bytes_read));
+            output_file.write(data, static_cast<streamsize>(bytes_received));
             
-            // total_bytes_read += bytes_read;
-            client_info->addBytesReceived(bytes_read);
+            total_bytes_received += bytes_received;
+            client_info->addBytesReceived(bytes_received);
 
-            remaining_bytes -= bytes_read;
+            remaining_bytes -= bytes_received;
         }
         output_file.close();
         io_context.run();
 
-        total_bytes_read = client_info->getTotalBytesReceived();
+        total_bytes_received = client_info->getTotalBytesReceived();
 
         cout << "File saved to " << file_path << endl;
-        cout << "Bytes received: " << total_bytes_read << endl;
+        cout << "Bytes received: " << total_bytes_received << endl;
 
         string read_status;
-        if (total_bytes_read == file_size) {
+        if (total_bytes_received == file_size) {
             read_status = "Success";
         } else {
             read_status = "Failure";
@@ -99,14 +99,24 @@ void FTPv2Server::handleConnection(tcp::socket socket) {
         }
         cout << "File transfrerring status: " << read_status << endl;
         write(socket, buffer(read_status + '\n'));
+        client_info->stopTiming();
+        speed_check_thread.join();
+        delete client_info;
         
-        sleep(30);
+        // sleep(30);
         cout << "Connection " << socket.remote_endpoint() << " is closed" << endl << endl;
         socket.close();
-        delete client_info;
 
     } catch (const exception& e) {
         cerr << e.what() << endl;
     }
 
+}
+
+size_t FTPv2Server::handleReading(boost::system::error_code& ec, size_t bytes_transferred) {
+    if (ec) {
+        cout << bytes_transferred << endl;
+        return 0;
+    }
+    return -1;
 }
