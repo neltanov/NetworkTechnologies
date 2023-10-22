@@ -1,4 +1,4 @@
-# Install script for directory: /home/nelta/net_tech/ftpv2/ftpv2_server
+# Install script for directory: /home/nelta/prog/net_tech/ftpv2/ftpv2_server
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -50,5 +50,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/nelta/net_tech/ftpv2/ftpv2_server/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/nelta/prog/net_tech/ftpv2/ftpv2_server/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

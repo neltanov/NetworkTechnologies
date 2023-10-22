@@ -53,10 +53,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/nelta/net_tech/ftpv2/ftpv2_server
+CMAKE_SOURCE_DIR = /home/nelta/prog/net_tech/ftpv2/ftpv2_server
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/nelta/net_tech/ftpv2/ftpv2_server/build
+CMAKE_BINARY_DIR = /home/nelta/prog/net_tech/ftpv2/ftpv2_server/build
 
 # Include any dependencies generated for this target.
 include CMakeFiles/corelib.dir/depend.make
@@ -72,30 +72,30 @@ include CMakeFiles/corelib.dir/flags.make
 CMakeFiles/corelib.dir/src/backend/ftpv2_server.cpp.o: CMakeFiles/corelib.dir/flags.make
 CMakeFiles/corelib.dir/src/backend/ftpv2_server.cpp.o: ../src/backend/ftpv2_server.cpp
 CMakeFiles/corelib.dir/src/backend/ftpv2_server.cpp.o: CMakeFiles/corelib.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/nelta/net_tech/ftpv2/ftpv2_server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/corelib.dir/src/backend/ftpv2_server.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/corelib.dir/src/backend/ftpv2_server.cpp.o -MF CMakeFiles/corelib.dir/src/backend/ftpv2_server.cpp.o.d -o CMakeFiles/corelib.dir/src/backend/ftpv2_server.cpp.o -c /home/nelta/net_tech/ftpv2/ftpv2_server/src/backend/ftpv2_server.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/nelta/prog/net_tech/ftpv2/ftpv2_server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/corelib.dir/src/backend/ftpv2_server.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/corelib.dir/src/backend/ftpv2_server.cpp.o -MF CMakeFiles/corelib.dir/src/backend/ftpv2_server.cpp.o.d -o CMakeFiles/corelib.dir/src/backend/ftpv2_server.cpp.o -c /home/nelta/prog/net_tech/ftpv2/ftpv2_server/src/backend/ftpv2_server.cpp
 
 CMakeFiles/corelib.dir/src/backend/ftpv2_server.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/corelib.dir/src/backend/ftpv2_server.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/nelta/net_tech/ftpv2/ftpv2_server/src/backend/ftpv2_server.cpp > CMakeFiles/corelib.dir/src/backend/ftpv2_server.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/nelta/prog/net_tech/ftpv2/ftpv2_server/src/backend/ftpv2_server.cpp > CMakeFiles/corelib.dir/src/backend/ftpv2_server.cpp.i
 
 CMakeFiles/corelib.dir/src/backend/ftpv2_server.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/corelib.dir/src/backend/ftpv2_server.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/nelta/net_tech/ftpv2/ftpv2_server/src/backend/ftpv2_server.cpp -o CMakeFiles/corelib.dir/src/backend/ftpv2_server.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/nelta/prog/net_tech/ftpv2/ftpv2_server/src/backend/ftpv2_server.cpp -o CMakeFiles/corelib.dir/src/backend/ftpv2_server.cpp.s
 
 CMakeFiles/corelib.dir/src/backend/client_info.cpp.o: CMakeFiles/corelib.dir/flags.make
 CMakeFiles/corelib.dir/src/backend/client_info.cpp.o: ../src/backend/client_info.cpp
 CMakeFiles/corelib.dir/src/backend/client_info.cpp.o: CMakeFiles/corelib.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/nelta/net_tech/ftpv2/ftpv2_server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/corelib.dir/src/backend/client_info.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/corelib.dir/src/backend/client_info.cpp.o -MF CMakeFiles/corelib.dir/src/backend/client_info.cpp.o.d -o CMakeFiles/corelib.dir/src/backend/client_info.cpp.o -c /home/nelta/net_tech/ftpv2/ftpv2_server/src/backend/client_info.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/nelta/prog/net_tech/ftpv2/ftpv2_server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/corelib.dir/src/backend/client_info.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/corelib.dir/src/backend/client_info.cpp.o -MF CMakeFiles/corelib.dir/src/backend/client_info.cpp.o.d -o CMakeFiles/corelib.dir/src/backend/client_info.cpp.o -c /home/nelta/prog/net_tech/ftpv2/ftpv2_server/src/backend/client_info.cpp
 
 CMakeFiles/corelib.dir/src/backend/client_info.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/corelib.dir/src/backend/client_info.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/nelta/net_tech/ftpv2/ftpv2_server/src/backend/client_info.cpp > CMakeFiles/corelib.dir/src/backend/client_info.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/nelta/prog/net_tech/ftpv2/ftpv2_server/src/backend/client_info.cpp > CMakeFiles/corelib.dir/src/backend/client_info.cpp.i
 
 CMakeFiles/corelib.dir/src/backend/client_info.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/corelib.dir/src/backend/client_info.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/nelta/net_tech/ftpv2/ftpv2_server/src/backend/client_info.cpp -o CMakeFiles/corelib.dir/src/backend/client_info.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/nelta/prog/net_tech/ftpv2/ftpv2_server/src/backend/client_info.cpp -o CMakeFiles/corelib.dir/src/backend/client_info.cpp.s
 
 corelib: CMakeFiles/corelib.dir/src/backend/ftpv2_server.cpp.o
 corelib: CMakeFiles/corelib.dir/src/backend/client_info.cpp.o
@@ -111,6 +111,6 @@ CMakeFiles/corelib.dir/clean:
 .PHONY : CMakeFiles/corelib.dir/clean
 
 CMakeFiles/corelib.dir/depend:
-	cd /home/nelta/net_tech/ftpv2/ftpv2_server/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/nelta/net_tech/ftpv2/ftpv2_server /home/nelta/net_tech/ftpv2/ftpv2_server /home/nelta/net_tech/ftpv2/ftpv2_server/build /home/nelta/net_tech/ftpv2/ftpv2_server/build /home/nelta/net_tech/ftpv2/ftpv2_server/build/CMakeFiles/corelib.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/nelta/prog/net_tech/ftpv2/ftpv2_server/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/nelta/prog/net_tech/ftpv2/ftpv2_server /home/nelta/prog/net_tech/ftpv2/ftpv2_server /home/nelta/prog/net_tech/ftpv2/ftpv2_server/build /home/nelta/prog/net_tech/ftpv2/ftpv2_server/build /home/nelta/prog/net_tech/ftpv2/ftpv2_server/build/CMakeFiles/corelib.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/corelib.dir/depend
 

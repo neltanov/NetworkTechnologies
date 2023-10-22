@@ -8,7 +8,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "/home/nelta/net_tech/ftpv2/ftpv2_server/src/backend/main.cpp" "CMakeFiles/ftpv2_server.dir/src/backend/main.cpp.o" "gcc" "CMakeFiles/ftpv2_server.dir/src/backend/main.cpp.o.d"
+  "/home/nelta/prog/net_tech/ftpv2/ftpv2_server/src/backend/main.cpp" "CMakeFiles/ftpv2_server.dir/src/backend/main.cpp.o" "gcc" "CMakeFiles/ftpv2_server.dir/src/backend/main.cpp.o.d"
   )
 
 # Targets to which this target links.

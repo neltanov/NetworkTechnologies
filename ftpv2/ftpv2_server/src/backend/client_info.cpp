@@ -2,13 +2,15 @@
 
 using namespace std;
 using namespace boost::asio;
+using boost::asio::ip::tcp;
 
-ClientInfo::ClientInfo()
+ClientInfo::ClientInfo(tcp::endpoint endpoint)
     :   io(),
         timer(io),   
         total_bytes_received(0),
         second_timer(),
-        is_data_ended(false) {}
+        is_data_ended(false),
+        remote_endpoint(endpoint) {}
 
 uint64_t ClientInfo::getTotalBytesReceived() const {
     return total_bytes_received;
@@ -39,7 +41,7 @@ void ClientInfo::printSpeedInfo() {
     pair<double, string> speed;
     double instantaneous_speed = static_cast<double>(current_bytes_received) / 3.0;
     speed = convertSpeed(instantaneous_speed);
-    cout << "Instantaneous speed: " << speed.first << " " << speed.second << endl;
+    cout << remote_endpoint << " | Instantaneous speed: " << speed.first << " " << speed.second << endl;
     current_bytes_received = 0;
 
     boost::timer::cpu_times elapsedTimes = second_timer.elapsed();
@@ -47,7 +49,7 @@ void ClientInfo::printSpeedInfo() {
     double elapsed_seconds = static_cast<double>(elapsedNanoseconds) / 1e9;
     double average_speed = static_cast<double>(total_bytes_received) / elapsed_seconds;
     speed = convertSpeed(average_speed);
-    cout << "Average speed: " << speed.first << " " << speed.second << endl;
+    cout << remote_endpoint << " | Average speed: " << speed.first << " " << speed.second << endl;
     
     startSpeedChecking();
 }

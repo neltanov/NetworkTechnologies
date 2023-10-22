@@ -8,10 +8,11 @@
 
 using namespace std;
 using namespace boost::asio;
+using boost::asio::ip::tcp;
 
 class ClientInfo {
 public:
-    ClientInfo();
+    ClientInfo(tcp::endpoint endpoint);
 
     size_t getTotalBytesReceived() const;
     void addBytesReceived(size_t bytesRead);
@@ -29,6 +30,7 @@ private:
     size_t total_bytes_received;
     boost::timer::auto_cpu_timer second_timer;
     bool is_data_ended;
+    tcp::endpoint remote_endpoint;
 };
 
 #endif // CLIENT_INFO_H

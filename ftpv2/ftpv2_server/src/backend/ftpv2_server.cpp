@@ -14,6 +14,7 @@ FTPv2Server::FTPv2Server(int server_port)
 
 void FTPv2Server::start() {
     try {
+        cout << "Server started listening connections on port " << acceptor.local_endpoint().port() << endl;
         while (true) {
             tcp::socket socket(io_context);
             acceptor.accept(socket);
@@ -28,14 +29,15 @@ void FTPv2Server::start() {
 
 void FTPv2Server::handleConnection(tcp::socket socket) {
     try {
-        cout << "New connection: " << socket.remote_endpoint() << endl;
+        tcp::endpoint remote_endpoint = socket.remote_endpoint();
+        cout << "New connection: " << remote_endpoint << endl;
 
         create_directory(uploads_dir);
 
         boost::asio::streambuf buffer_stream;
         string filename;
 
-        ClientInfo* client_info = new ClientInfo();
+        ClientInfo* client_info = new ClientInfo(remote_endpoint);
 
         std::thread speed_check_thread(&ClientInfo::speedCheck, client_info);
         
@@ -44,12 +46,13 @@ void FTPv2Server::handleConnection(tcp::socket socket) {
         istream filenameStream(&buffer_stream);
         getline(filenameStream, filename);
 
-        cout << "Filename: " << filename << endl;
+        cout << remote_endpoint << " | Filename: " << filename << endl;
         
         path file_path = uploads_dir / path(filename);
         std::ofstream output_file(file_path.string(), ios::binary);
         if (!output_file.is_open()) {
             cerr << "File opening failed: " << file_path << endl;
+            socket.close();
             return;
         }
 
@@ -60,7 +63,7 @@ void FTPv2Server::handleConnection(tcp::socket socket) {
         getline(string_stream, file_size_str);
 
         size_t file_size = stoull(file_size_str);
-        cout << "File size: " << file_size << " bytes" << endl;
+        cout << remote_endpoint << " | File size: " << file_size << " bytes" << endl;
 
         string ready_status = "Ready";
         write(socket, buffer(ready_status + '\n'));
@@ -73,8 +76,11 @@ void FTPv2Server::handleConnection(tcp::socket socket) {
         
         while (remaining_bytes > 0) {
             size_t buffer_size = (remaining_bytes < sizeof(data)) ? remaining_bytes : sizeof(data);
-            bytes_received = read(socket, boost::asio::buffer(data, buffer_size)/* , boost::bind(&FTPv2Server::handleReading, this, _1, _2) */);
-            
+            bytes_received = read(socket, boost::asio::buffer(data, buffer_size), ec);
+            if (ec) {
+                break;
+            }
+
             output_file.write(data, static_cast<streamsize>(bytes_received));
             
             total_bytes_received += bytes_received;
@@ -87,8 +93,8 @@ void FTPv2Server::handleConnection(tcp::socket socket) {
 
         total_bytes_received = client_info->getTotalBytesReceived();
 
-        cout << "File saved to " << file_path << endl;
-        cout << "Bytes received: " << total_bytes_received << endl;
+        cout << remote_endpoint << " | File saved to " << file_path << endl;
+        cout << remote_endpoint << " | Bytes received: " << total_bytes_received << endl;
 
         string read_status;
         if (total_bytes_received == file_size) {
@@ -97,14 +103,14 @@ void FTPv2Server::handleConnection(tcp::socket socket) {
             read_status = "Failure";
             boost::filesystem::remove(uploads_dir.string() + '/' + filename);
         }
-        cout << "File transfrerring status: " << read_status << endl;
+        cout << remote_endpoint << " | File transfrerring status: " << read_status << endl;
         write(socket, buffer(read_status + '\n'));
         client_info->stopTiming();
         speed_check_thread.join();
         delete client_info;
         
         // sleep(30);
-        cout << "Connection " << socket.remote_endpoint() << " is closed" << endl << endl;
+        cout << "Connection " << remote_endpoint << " is closed" << endl << endl;
         socket.close();
 
     } catch (const exception& e) {
