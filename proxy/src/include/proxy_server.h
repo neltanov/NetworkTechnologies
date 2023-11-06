@@ -20,7 +20,7 @@ private:
     void handleRequest();
     void startDataTransfer(ip::tcp::socket& client_socket, std::shared_ptr<boost::asio::ip::tcp::socket> remote_socket);
 
-    static const int max_length = 1024;
+    static const int max_length = 4096;
     char buffer_data[max_length];
 };
 

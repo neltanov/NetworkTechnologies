@@ -27,7 +27,7 @@ void Socks5Proxy::acceptConnection() {
 }
 
 void Socks5Proxy::handleHandshake() {
-    // Reading client greeting (SOCKS version, number of authentication methods supported)
+    // Reading client greeting (SOCKS version and number of authentication methods supported)
     async_read(client_socket, buffer(buffer_data, 2),
         [this](const boost::system::error_code& ec, std::size_t length) {
             if (!ec && length == 2 && buffer_data[0] == 5) {
@@ -75,10 +75,8 @@ void Socks5Proxy::handleRequest() {
                                             port = ntohs(port);
                                             std::cout << "Remote server: " << ip.to_string() << ":" << port << std::endl;
 
-                                            // Создаем удаленный сокет для подключения к серверу
-                                            // ip::tcp::socket remote_socket(client_socket.get_executor());
                                             auto remote_socket = std::make_shared<ip::tcp::socket>(client_socket.get_executor());
-                                            // Подключаемся к серверу
+                                            
                                             remote_socket->async_connect(ip::tcp::endpoint(ip, port),
                                                 [this, remote_socket](const boost::system::error_code& ec) {
                                                     if (!ec) {
@@ -102,7 +100,8 @@ void Socks5Proxy::handleRequest() {
                                 });
                             }
                             else if (address_type == 3) { // TODO: DNS resolving
-                                std::cout << "DNS resolving not done yet" << std::endl;
+                                std::cout << "DNS resolving is not done yet" << std::endl;
+
                             }
                             else if (address_type == 4) { // IPv6 address (don't need)
                                 std::cout << "IPv6 is not supported" << std::endl;
@@ -120,7 +119,7 @@ void Socks5Proxy::startDataTransfer(ip::tcp::socket& client_socket, std::shared_
                 async_write(*remote_socket, buffer(buffer_data, length),
                     [this, &client_socket, remote_socket](const boost::system::error_code& ec, std::size_t) {
                         if (!ec) {
-                            std::cout << "Starting data transfer to " << remote_socket.get()->local_endpoint() << std::endl;
+                            std::cout << "Starting data transfer to " << remote_socket.get()->remote_endpoint() << std::endl;
                             startDataTransfer(client_socket, remote_socket);
                         } else {
                             // client_socket.close();
@@ -141,8 +140,8 @@ void Socks5Proxy::startDataTransfer(ip::tcp::socket& client_socket, std::shared_
                 async_write(client_socket, buffer(buffer_data, length),
                     [this, &client_socket, remote_socket](const boost::system::error_code& ec, std::size_t) {
                         if (!ec) {
-                            std::cout << "Starting data transfer to " << client_socket.local_endpoint() << std::endl;
-                            startDataTransfer(client_socket, remote_socket);
+                            std::cout << "Starting data transfer to " << client_socket.remote_endpoint() << std::endl;
+                            startDataTransfer(client_socket, remote_socket);    
                         } else {
                             // client_socket.close();
                             // remote_socket->close();
