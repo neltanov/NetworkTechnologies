@@ -72,7 +72,13 @@
         "typeinfo": "cpp",
         "variant": "cpp",
         "fstream": "cpp",
-        "shared_mutex": "cpp"
+        "shared_mutex": "cpp",
+        "forward_list": "cpp",
+        "buffer": "cpp",
+        "executor": "cpp",
+        "io_context": "cpp",
+        "netfwd": "cpp",
+        "socket": "cpp"
     },
     "cmake.sourceDirectory": "/home/nelta/net_tech/selfdetecting",
     "cmake.configureOnOpen": false
