@@ -20,11 +20,11 @@ void Socks5Proxy::start() {
 }
 
 void Socks5Proxy::acceptConnection() {
-    Connection* connection = connection_pool.getConnection();
+    Connection connection = connection_pool.getConnection();
     client_acceptor.async_accept(*connection.getSocket(),
-        [this, connection](const error_code& ec) {
+        [this, &connection](const error_code& ec) {
             if (!ec) {
-                std::cout << "New connection: " << connection->getSocket()->remote_endpoint() << std::endl;
+                std::cout << "New connection: " << connection.getSocket()->remote_endpoint() << std::endl;
                 handleGreeting(connection);
             }
             acceptConnection();
