@@ -12,14 +12,14 @@ class ConnectionPool {
 public:
     ConnectionPool(io_context& io) : io_ctx(io) {}
 
-    void addConnection(Connection connection) {
-        connection.close();
+    void addConnection(std::shared_ptr<Connection> connection) {
+        connection->close();
         connections.push_back(connection);
     }
 
-    Connection getConnection() {
+    std::shared_ptr<Connection> getConnection() {
         if (connections.empty()) {
-            return Connection(io_ctx);
+            return std::make_shared<Connection>(io_ctx);
         } else {
             auto connection = connections.back();
             connections.pop_back();
@@ -29,7 +29,7 @@ public:
 
 private:
     io_context& io_ctx;
-    std::vector<Connection> connections;
+    std::vector<std::shared_ptr<Connection>> connections;
 
 };
 

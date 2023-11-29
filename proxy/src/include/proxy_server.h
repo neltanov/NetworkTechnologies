@@ -25,24 +25,24 @@ private:
     // char buffer_data[max_length];
 
     void acceptConnection();
-    void handleGreeting(Connection& connection);
-    void readAuthMethods(const error_code& ec, std::size_t length, Connection& connection);
-    void sendServerChoice(const error_code& ec, std::size_t length, std::size_t count_of_methods, Connection& connection);
-    void handleConnectionRequest(const error_code& ec, std::size_t length, Connection& connection);
+    void handleGreeting(std::shared_ptr<Connection> connection);
+    void readAuthMethods(const error_code& ec, std::size_t length, std::shared_ptr<Connection> connection);
+    void sendServerChoice(const error_code& ec, std::size_t length, std::size_t count_of_methods, std::shared_ptr<Connection> connection);
+    void handleConnectionRequest(const error_code& ec, std::size_t length, std::shared_ptr<Connection> connection);
 
-    void readAddressType(const error_code& ec, std::size_t length, Connection& connection);
-    void handleAddress(const error_code& ec, std::size_t length, Connection& connection);
+    void readAddressType(const error_code& ec, std::size_t length, std::shared_ptr<Connection> connection);
+    void handleAddress(const error_code& ec, std::size_t length, std::shared_ptr<Connection> connection);
 
-    void readIPv4Address(const error_code& ec, std::size_t length, Connection& connection);
+    void readIPv4Address(const error_code& ec, std::size_t length, std::shared_ptr<Connection> connection);
 
-    void getDomainLength(const error_code& ec, std::size_t length, Connection& connection);
-    void getDomainName(const error_code& ec, std::size_t length, Connection& connection);
+    void getDomainLength(const error_code& ec, std::size_t length, std::shared_ptr<Connection> connection);
+    void getDomainName(const error_code& ec, std::size_t length, std::shared_ptr<Connection> connection);
 
-    void sendServerResponse(const error_code& ec, Connection& connection, std::shared_ptr<tcp::socket> remote_socket);
+    void sendServerResponse(const error_code& ec, std::shared_ptr<Connection> connection, std::shared_ptr<tcp::socket> remote_socket);
     
-    void startDataTransfer(const error_code& ec, std::size_t, Connection& connection, std::shared_ptr<tcp::socket> remote_socket);
-    void sendDataToServer(const error_code& ec, std::size_t length, Connection& connection, std::shared_ptr<tcp::socket> remote_socket);
-    void sendDataToClient(const error_code& ec, std::size_t length, Connection& connection, std::shared_ptr<tcp::socket> remote_socket);
+    void startDataTransfer(const error_code& ec, std::size_t, std::shared_ptr<Connection> connection, std::shared_ptr<tcp::socket> remote_socket);
+    void sendDataToServer(const error_code& ec, std::size_t length, std::shared_ptr<Connection> connection, std::shared_ptr<tcp::socket> remote_socket);
+    void sendDataToClient(const error_code& ec, std::size_t length, std::shared_ptr<Connection> connection, std::shared_ptr<tcp::socket> remote_socket);
 };
 
 #endif // PROXY_SERVER_H

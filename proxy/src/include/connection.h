@@ -12,10 +12,10 @@ using boost::asio::ip::tcp;
 class Connection {
 public:
     Connection(io_context& io) 
-    : socket(std::make_shared<tcp::socket>(io)),
+    : socket(io),
      buffer() {}
 
-    std::shared_ptr<tcp::socket> getSocket() {
+    tcp::socket& getSocket()  {
         return socket;
     }
 
@@ -24,15 +24,15 @@ public:
     }
 
     void close() {
-        if (socket && socket->is_open()) {
+        if (socket.is_open()) {
             boost::system::error_code ec;
-            socket->shutdown(tcp::socket::shutdown_both, ec);
-            socket->close(ec);
+            socket.shutdown(tcp::socket::shutdown_both, ec);
+            socket.close(ec);
         }
     }
 
 private:
-    std::shared_ptr<tcp::socket> socket;
+    tcp::socket socket;
     char buffer[4096];
 };
 
