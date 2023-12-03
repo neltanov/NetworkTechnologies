@@ -12,8 +12,7 @@ using boost::asio::ip::tcp;
 class Connection {
 public:
     Connection(io_context& io) 
-    : socket(io),
-     buffer() {}
+    : socket(io) {}
 
     tcp::socket& getSocket()  {
         return socket;
@@ -23,10 +22,14 @@ public:
         return buffer;
     }
 
+    char* recv_data() {
+        return recv_buf;
+    }
+
     void close() {
+        boost::system::error_code ec;
+        socket.shutdown(tcp::socket::shutdown_both, ec);
         if (socket.is_open()) {
-            boost::system::error_code ec;
-            socket.shutdown(tcp::socket::shutdown_both, ec);
             socket.close(ec);
         }
     }
@@ -34,6 +37,7 @@ public:
 private:
     tcp::socket socket;
     char buffer[4096];
+    char recv_buf[4096];
 };
 
 #endif // CONNECTION_H

@@ -22,7 +22,6 @@ private:
     ConnectionPool connection_pool;
 
     static const int max_length = 4096;
-    // char buffer_data[max_length];
 
     void acceptConnection();
     void handleGreeting(std::shared_ptr<Connection> connection);
