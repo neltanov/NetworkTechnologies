@@ -6,6 +6,7 @@
 #include <boost/asio.hpp>
 #include <boost/bind/bind.hpp>
 #include "connection_pool.h"
+#include "proxy_const.h"
 
 using namespace boost::asio;
 using namespace boost::system;
@@ -33,11 +34,13 @@ private:
     void handleAddress(const error_code& ec, std::size_t length, std::shared_ptr<Connection> connection);
 
     void readIPv4Address(const error_code& ec, std::size_t length, std::shared_ptr<Connection> connection);
+    void readIPv6Address(const error_code& ec, std::size_t length, std::shared_ptr<Connection> connection);
 
     void getDomainLength(const error_code& ec, std::size_t length, std::shared_ptr<Connection> connection);
     void getDomainName(const error_code& ec, std::size_t length, std::shared_ptr<Connection> connection);
 
-    void sendServerResponse(const error_code& ec, std::shared_ptr<Connection> connection, std::shared_ptr<tcp::socket> remote_socket);
+    unsigned char getConnectionError(const error_code& ec);
+    void sendServerResponse(const error_code& ec, std::shared_ptr<Connection> connection, std::shared_ptr<tcp::socket> remote_socket, tcp::endpoint remote_endpoint);
     
     void startDataTransfer(const error_code& ec, std::size_t, std::shared_ptr<Connection> connection, std::shared_ptr<tcp::socket> remote_socket);
     void sendDataToServer(const error_code& ec, std::size_t length, std::shared_ptr<Connection> connection, std::shared_ptr<tcp::socket> remote_socket);
