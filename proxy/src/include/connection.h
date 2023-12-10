@@ -36,8 +36,8 @@ public:
 
 private:
     tcp::socket socket;
-    char buffer[4096];
-    char recv_buf[4096];
+    char buffer[8192];
+    char recv_buf[8192];
 };
 
 #endif // CONNECTION_H
