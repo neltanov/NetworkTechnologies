@@ -13,6 +13,7 @@ public:
     ConnectionPool(io_context& io) : io_ctx(io) {}
 
     void addConnection(std::shared_ptr<Connection> connection) {
+        std::cout << "Connection " << connection->getSocket().remote_endpoint() << " closed" << std::endl;
         if (connection->getSocket().is_open()) {
             connection->close();
             connections.push_back(connection);

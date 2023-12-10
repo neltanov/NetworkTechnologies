@@ -94,7 +94,7 @@ void Socks5Proxy::handleAddress(const error_code& ec, std::size_t length, std::s
             async_read(connection->getSocket(), buffer(connection->data(), 1), bind(&Socks5Proxy::getDomainLength, this, _1, _2, connection));
         }
         else if (address_type == IP_V6) { // IPv6 address
-            async_read(connection->getSocket(), buffer(connection->data(), 18), bind(&Socks5Proxy::readIPv6Address, this, _1, _2, connection));
+            // async_read(connection->getSocket(), buffer(connection->data(), 18), bind(&Socks5Proxy::readIPv6Address, this, _1, _2, connection));
         }
     }
     else {
@@ -246,12 +246,11 @@ void Socks5Proxy::sendServerResponse(const error_code& ec, std::shared_ptr<Conne
 void Socks5Proxy::startDataTransfer(const error_code& ec, std::size_t, std::shared_ptr<Connection> connection, std::shared_ptr<tcp::socket> remote_socket) {
     try {
         if (!ec) {
-            connection->getSocket().async_wait(tcp::socket::wait_read, bind(&Socks5Proxy::readDataFromClient, this, _1, connection, remote_socket));
-            // remote_socket->async_wait(tcp::socket::wait_read, bind(&Socks5Proxy::readDataFromServer, this, _1, connection, remote_socket));
+            connection->getSocket().async_read_some(buffer(connection->data(), max_length), bind(&Socks5Proxy::sendDataToServer, this, _1, _2, connection, remote_socket));
+            remote_socket->async_read_some(buffer(connection->recv_data(), max_length), bind(&Socks5Proxy::sendDataToClient, this, _1, _2, connection, remote_socket));
         }
         else {
             connection_pool.addConnection(connection);
-
             error_code er_code;
             if (remote_socket->is_open()) {
                 remote_socket->shutdown(tcp::socket::shutdown_both, er_code);
@@ -264,12 +263,10 @@ void Socks5Proxy::startDataTransfer(const error_code& ec, std::size_t, std::shar
     }
 }
 
-void Socks5Proxy::readDataFromClient(const error_code& ec, std::shared_ptr<Connection> connection, std::shared_ptr<tcp::socket> remote_socket) {
+void Socks5Proxy::recvDataFromClient(const error_code& ec, std::size_t length, std::shared_ptr<Connection> connection, std::shared_ptr<tcp::socket> remote_socket) {
     try {
         if (!ec) {
-            std::vector<char> data(4096);
-            std::cout << "readDataFromClient" << std::endl;
-            connection->getSocket().async_read_some(buffer(data), bind(&Socks5Proxy::writeDataToServer, this, _1, _2, connection, remote_socket, data));                
+            connection->getSocket().async_read_some(buffer(connection->data(), length), bind(&Socks5Proxy::sendDataToServer, this, _1, _2, connection, remote_socket));
         } else {
             connection_pool.addConnection(connection);
             error_code er_code;
@@ -279,19 +276,15 @@ void Socks5Proxy::readDataFromClient(const error_code& ec, std::shared_ptr<Conne
             }
         }
     }
-    catch (boost::system::system_error& e) {
-        std::cerr << "readDataFromClient: " << e.what() << std::endl;
+    catch(boost::system::system_error& e) {
+        std::cerr << "recvDataFromClient: " << e.what() << std::endl;
     }
 }
 
-
-void Socks5Proxy::readDataFromServer(const error_code& ec, std::shared_ptr<Connection> connection, std::shared_ptr<tcp::socket> remote_socket) {
+void Socks5Proxy::recvDataFromServer(const error_code& ec, std::size_t length, std::shared_ptr<Connection> connection, std::shared_ptr<tcp::socket> remote_socket) {
     try {
         if (!ec) {
-            std::vector<char> data(4096);
-            std::cout << "readDataFromServer" << std::endl;
-
-            remote_socket->async_read_some(buffer(data), bind(&Socks5Proxy::writeDataToClient, this, _1, _2, connection, remote_socket, data));                
+            remote_socket->async_read_some(buffer(connection->recv_data(), length), bind(&Socks5Proxy::sendDataToClient, this, _1, _2, connection, remote_socket));
         } else {
             connection_pool.addConnection(connection);
             error_code er_code;
@@ -301,16 +294,15 @@ void Socks5Proxy::readDataFromServer(const error_code& ec, std::shared_ptr<Conne
             }
         }
     }
-    catch (boost::system::system_error& e) {
-        std::cerr << "readDataFromClient: " << e.what() << std::endl;
+    catch(boost::system::system_error& e) {
+        std::cerr << "recvDataFromServer: " << e.what() << std::endl;
     }
 }
 
-void Socks5Proxy::writeDataToServer(const error_code& ec, std::size_t length, std::shared_ptr<Connection> connection, std::shared_ptr<tcp::socket> remote_socket, std::vector<char>& data) {
+void Socks5Proxy::sendDataToServer(const error_code& ec, std::size_t length, std::shared_ptr<Connection> connection, std::shared_ptr<tcp::socket> remote_socket) {
     try {
         if (!ec) {
-            std::cout << "writeDataToServer " << length << std::endl;
-            remote_socket->async_write_some(buffer(data, length), bind(&Socks5Proxy::readDataFromServer, this, _1, connection, remote_socket));
+                remote_socket->async_write_some(buffer(connection->data(), length), bind(&Socks5Proxy::recvDataFromClient, this, _1, _2, connection, remote_socket));
         } else {
             connection_pool.addConnection(connection);
             error_code er_code;
@@ -321,16 +313,14 @@ void Socks5Proxy::writeDataToServer(const error_code& ec, std::size_t length, st
         }
     }
     catch (boost::system::system_error& e) {
-        std::cerr << "readDataFromClient: " << e.what() << std::endl;
+        std::cerr << "sendDataToServer: " << e.what() << std::endl;
     }
 }
 
-
-void Socks5Proxy::writeDataToClient(const error_code& ec, std::size_t length, std::shared_ptr<Connection> connection, std::shared_ptr<tcp::socket> remote_socket, std::vector<char>& data) {
+void Socks5Proxy::sendDataToClient(const error_code& ec, std::size_t length, std::shared_ptr<Connection> connection, std::shared_ptr<tcp::socket> remote_socket) {
     try {
         if (!ec) {
-            std::cout << "writeDataToClient" << length << std::endl;
-            connection->getSocket().async_write_some(buffer(data, length), bind(&Socks5Proxy::startDataTransfer, this, _1, _2, connection, remote_socket));
+                connection->getSocket().async_write_some(buffer(connection->recv_data(), length), bind(&Socks5Proxy::recvDataFromServer, this, _1, _2, connection, remote_socket));
         } else {
             connection_pool.addConnection(connection);
             error_code er_code;
@@ -341,6 +331,6 @@ void Socks5Proxy::writeDataToClient(const error_code& ec, std::size_t length, st
         }
     }
     catch (boost::system::system_error& e) {
-        std::cerr << "readDataFromClient: " << e.what() << std::endl;
+        std::cerr << "sendDataToClient: " << e.what() << std::endl;
     }
 }
