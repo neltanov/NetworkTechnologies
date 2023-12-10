@@ -9,6 +9,8 @@ using namespace boost::asio;
 using namespace boost::system;
 using boost::asio::ip::tcp;
 
+#define BUF_SIZE 8192
+
 class Connection {
 public:
     Connection(io_context& io) 
@@ -18,12 +20,12 @@ public:
         return socket;
     }
 
-    char* data() {
-        return buffer;
+    char* toServerBuf() {
+        return to_server_buf;
     }
 
-    char* recv_data() {
-        return recv_buf;
+    char* toClientBuf() {
+        return to_client_buf;
     }
 
     void close() {
@@ -36,8 +38,8 @@ public:
 
 private:
     tcp::socket socket;
-    char buffer[8192];
-    char recv_buf[8192];
+    char to_server_buf[BUF_SIZE];
+    char to_client_buf[BUF_SIZE];
 };
 
 #endif // CONNECTION_H

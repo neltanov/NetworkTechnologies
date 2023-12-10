@@ -1,13 +1,13 @@
 enum ProxyConst
 {
-    VERSION = 0x05,
+    SOCKS5 = 0x05,
     NO_AUTH = 0x00,
     NO_ACCEPTABLE_METHODS = 0xff,
     CONNECT = 0x01,
     BIND = 0x02,
     UDP_ASSOCIATE = 0x03,
-    RSV = 0x0,
-    IP_V4 = 0x01,
+    RESERVED = 0x0,
+    IPv4 = 0x01,
     DOMAIN_NAME = 0x03,
     IP_V6 = 0x04,
     SUCCESS = 0x00,

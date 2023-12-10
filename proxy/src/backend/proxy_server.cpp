@@ -31,115 +31,88 @@ void Socks5Proxy::acceptConnection() {
 }
 
 void Socks5Proxy::handleGreeting(std::shared_ptr<Connection> connection) {
-    // Reading client greeting (SOCKS version and number of authentication methods supported)
-    async_read(connection->getSocket(), buffer(connection->data(), 2), bind(&Socks5Proxy::readAuthMethods, this, _1, _2, connection));
+    async_read(connection->getSocket(), buffer(connection->toServerBuf(), 2), bind(&Socks5Proxy::readAuthMethods, this, _1, _2, connection));
 }
 
 void Socks5Proxy::readAuthMethods(const error_code& ec, std::size_t length, std::shared_ptr<Connection> connection) {
-    if (!ec && length == 2 && connection->data()[0] == VERSION) {
-        size_t count_of_methods = connection->data()[1];
-        // Reading authentication methods
-        async_read(connection->getSocket(), buffer(connection->data(), count_of_methods), 
+    if (!ec && length == 2 && connection->toServerBuf()[0] == SOCKS5) {
+        size_t count_of_methods = connection->toServerBuf()[1];
+        async_read(connection->getSocket(), buffer(connection->toServerBuf(), count_of_methods), 
                     bind(&Socks5Proxy::sendServerChoice, this, _1, _2, count_of_methods, connection));
     }
-    // else {
-    //     std::cerr << "Auth methods receiving error: " << ec.message() << std::endl;
-    //     connection_pool.addConnection(connection);
-    // }
+    else {
+        std::cerr << "Auth methods receiving error: " << ec.message() << std::endl;
+        connection_pool.addConnection(connection);
+    }
 }
 
 void Socks5Proxy::sendServerChoice(const error_code& ec, std::size_t length, std::size_t count_of_methods, std::shared_ptr<Connection> connection) {
     if (!ec && length == count_of_methods) {
-        connection->data()[0] = VERSION;  // SOCKS5 version
-        connection->data()[1] = NO_AUTH;  // No authentification method
-        // Sending server choice
-        async_write(connection->getSocket(), buffer(connection->data(), 2), bind(&Socks5Proxy::handleConnectionRequest, this, _1, _2, connection));
+        connection->toServerBuf()[0] = SOCKS5;
+        connection->toServerBuf()[1] = NO_AUTH;
+        async_write(connection->getSocket(), buffer(connection->toServerBuf(), 2), bind(&Socks5Proxy::handleConnectionRequest, this, _1, _2, connection));
     }
-    // else {
-    //     std::cerr << "Server choice sending error: " << ec.message() << std::endl;
-    //     connection_pool.addConnection(connection);
-    // }
+    else {
+        std::cerr << "Server choice sending error: " << ec.message() << std::endl;
+        connection_pool.addConnection(connection);
+    }
 }
 
 void Socks5Proxy::handleConnectionRequest(const error_code& ec, std::size_t, std::shared_ptr<Connection> connection) {
     if (!ec) {
-        // Reading client connection request (Firstly, SOCKS version, command code and reserved byte)
-        async_read(connection->getSocket(), buffer(connection->data(), 3), bind(&Socks5Proxy::readAddressType, this, _1, _2, connection));
+        async_read(connection->getSocket(), buffer(connection->toServerBuf(), 3), bind(&Socks5Proxy::readAddressType, this, _1, _2, connection));
     }
-    // else {
-    //     std::cerr << "Client connection request is failed: " << ec.message() << std::endl;
-    //     connection_pool.addConnection(connection);
-    // }
+    else {
+        std::cerr << "Client connection request is failed: " << ec.message() << std::endl;
+        connection_pool.addConnection(connection);
+    }
 }
 
 void Socks5Proxy::readAddressType(const error_code& ec, std::size_t length, std::shared_ptr<Connection> connection) {
-    if (!ec && length == 3 && connection->data()[0] == VERSION && connection->data()[1] == CONNECT && connection->data()[2] == RSV) {
-        // Reading address type
-        async_read(connection->getSocket(), buffer(connection->data(), 1), bind(&Socks5Proxy::handleAddress, this, _1, _2, connection));
+    if (!ec && length == 3 && connection->toServerBuf()[0] == SOCKS5 && connection->toServerBuf()[1] == CONNECT && connection->toServerBuf()[2] == RESERVED) {
+        async_read(connection->getSocket(), buffer(connection->toServerBuf(), 1), bind(&Socks5Proxy::handleAddress, this, _1, _2, connection));
     }
-    // else {
-    //     std::cerr << "Address type reading error: " << ec.message() << std::endl;
-    //     connection_pool.addConnection(connection);
-    // }
+    else {
+        std::cerr << "Address type reading error: " << ec.message() << std::endl;
+        connection_pool.addConnection(connection);
+    }
 }
 
 void Socks5Proxy::handleAddress(const error_code& ec, std::size_t length, std::shared_ptr<Connection> connection) {
     if (!ec && length == 1) {
-        uint8_t address_type = connection->data()[0];
-        if (address_type == IP_V4) { // IPv4 address
-            // Read 4 bytes address and 2 bytes port
-            async_read(connection->getSocket(), buffer(connection->data(), 6), bind(&Socks5Proxy::readIPv4Address, this, _1, _2, connection));
+        uint8_t address_type = connection->toServerBuf()[0];
+        if (address_type == IPv4) {
+            async_read(connection->getSocket(), buffer(connection->toServerBuf(), 6), bind(&Socks5Proxy::readIPv4Address, this, _1, _2, connection));
         }
-        else if (address_type == DOMAIN_NAME) { // Domain name
-            async_read(connection->getSocket(), buffer(connection->data(), 1), bind(&Socks5Proxy::getDomainLength, this, _1, _2, connection));
+        else if (address_type == DOMAIN_NAME) {
+            async_read(connection->getSocket(), buffer(connection->toServerBuf(), 1), bind(&Socks5Proxy::getDomainLength, this, _1, _2, connection));
         }
-        // else if (address_type == IP_V6) { // IPv6 address
-        //     async_read(connection->getSocket(), buffer(connection->data(), 18), bind(&Socks5Proxy::readIPv6Address, this, _1, _2, connection));
-        // }
+        else {
+            connection_pool.addConnection(connection);
+        }
     }
-    // else {
-    //     std::cerr << "Address handling error: " << ec.message() << std::endl;
-    //     connection_pool.addConnection(connection);
-    // }
+    else {
+        std::cerr << "Address handling error: " << ec.message() << std::endl;
+        connection_pool.addConnection(connection);
+    }
 }
 
 void Socks5Proxy::readIPv4Address(const error_code& ec, std::size_t length, std::shared_ptr<Connection> connection) {
     if (!ec && length == 6) {
         ip::address_v4::bytes_type ip_address_bytes;
-        memcpy(ip_address_bytes.data(), &connection->data()[0], 4);
+        memcpy(ip_address_bytes.data(), &connection->toServerBuf()[0], 4);
         ip::address_v4 ip(ip_address_bytes);
 
         uint16_t port;
-        memcpy(&port, &connection->data()[4], 2);
+        memcpy(&port, &connection->toServerBuf()[4], 2);
         port = ntohs(port);
 
         auto remote_socket = std::make_shared<tcp::socket>(io_ctx);
         
         remote_socket->async_connect(tcp::endpoint(ip, port), bind(&Socks5Proxy::sendServerResponse, this, _1, connection, remote_socket, tcp::endpoint(ip, port)));
     }
-    // else {
-    //     std::cerr << "IPv4 address reading error: " << ec.message() << std::endl;
-    //     connection_pool.addConnection(connection);
-    // }
-}
-
-void Socks5Proxy::readIPv6Address(const error_code& ec, std::size_t length, std::shared_ptr<Connection> connection) {
-    if (!ec && length == 18) {
-        ip::address_v6::bytes_type ip_address_bytes;
-        memcpy(ip_address_bytes.data(), &connection->data()[0], 16);
-        ip::address_v6 ip(ip_address_bytes);
-
-        uint16_t port;
-        memcpy(&port, &connection->data()[16], 2);
-        port = ntohs(port);
-
-        auto remote_socket = std::make_shared<tcp::socket>(io_ctx);
-        std::cout << tcp::endpoint(ip, port) << std::endl;
-
-        remote_socket->async_connect(tcp::endpoint(ip, port), bind(&Socks5Proxy::sendServerResponse, this, _1, connection, remote_socket, tcp::endpoint(ip, port)));
-    }
     else {
-        std::cerr << "IPv6 address reading error: " << ec.message() << std::endl;
+        std::cerr << "IPv4 address reading error: " << ec.message() << std::endl;
         connection_pool.addConnection(connection);
     }
 }
@@ -147,10 +120,10 @@ void Socks5Proxy::readIPv6Address(const error_code& ec, std::size_t length, std:
 void Socks5Proxy::getDomainLength(const error_code& ec, std::size_t length, std::shared_ptr<Connection> connection) {
     if (!ec && length == 1) {
         uint16_t name_length;
-        memcpy(&name_length, &connection->data()[0], 1);
+        memcpy(&name_length, &connection->toServerBuf()[0], 1);
         std::cout << "Domain name length: " << name_length << std::endl;
 
-        async_read(connection->getSocket(), buffer(connection->data(), name_length), bind(&Socks5Proxy::getDomainName, this, _1, _2, connection));
+        async_read(connection->getSocket(), buffer(connection->toServerBuf(), name_length), bind(&Socks5Proxy::getDomainName, this, _1, _2, connection));
     }
     else {
         std::cerr << "Get domain length error: " << ec.message() << std::endl;
@@ -181,71 +154,45 @@ unsigned char Socks5Proxy::getConnectionError(const error_code& ec) {
         return CONNECTION_REFUSED;
     } if (ec == error::timed_out) {
         return TTL_EXPIRED;
-    } /* if (cmd != CONNECT) {
-        return COMMAND_NOT_SUPPORTED;
-    } */ if (ec == error::address_family_not_supported) {
+    } if (ec == error::address_family_not_supported) {
         return ADDRESS_TYPE_NOT_SUPPORTED;
     }
     return SUCCESS;
 }
 
 void Socks5Proxy::sendServerResponse(const error_code& ec, std::shared_ptr<Connection> connection, std::shared_ptr<tcp::socket> remote_socket, tcp::endpoint remote_endpoint) {
-    connection->data()[0] = VERSION;                 // SOCKS version
-    connection->data()[1] = getConnectionError(ec);  // Status
-    connection->data()[2] = RSV;                     // Reserved byte
+    connection->toServerBuf()[0] = SOCKS5;
+    connection->toServerBuf()[1] = getConnectionError(ec);
+    connection->toServerBuf()[2] = RESERVED;
+    connection->toServerBuf()[3] = IPv4;
 
     ip::address address = remote_endpoint.address();
     uint16_t port = htons(remote_endpoint.port());
 
-    if (address.is_v4()) {
-        connection->data()[3] = IP_V4;
-        ip::address_v4::bytes_type address_bytes = address.to_v4().to_bytes();
+    ip::address_v4::bytes_type address_bytes = address.to_v4().to_bytes();
 
-        for (size_t i = 0; i < address_bytes.size(); i++) {
-            connection->data()[i + 4] = address_bytes[i];
-        }
-
-        memcpy(&connection->data()[address_bytes.size() + 4], &port, 2);
-
-        if (!ec) {
-            std::cout << "Connected to remote server " << remote_socket->remote_endpoint() << std::endl;
-            async_write(connection->getSocket(), buffer(connection->data(), address_bytes.size() + 6), 
-                    bind(&Socks5Proxy::startDataTransfer, this, _1, _2, connection, remote_socket));
-        }
-        else {
-            std::cout << "Connection to server has been failed. Reason: " << ec.message() << std::endl;
-            async_write(connection->getSocket(), buffer(connection->data(), address_bytes.size() + 6), bind(&ConnectionPool::addConnection, &this->connection_pool, connection));
-        }
+    for (size_t i = 0; i < address_bytes.size(); i++) {
+        connection->toServerBuf()[i + 4] = address_bytes[i];
     }
-    else if (address.is_v6()) {
-        connection->data()[3] = IP_V6;
 
-        ip::address_v6::bytes_type address_bytes = address.to_v6().to_bytes();
+    memcpy(&connection->toServerBuf()[address_bytes.size() + 4], &port, 2);
 
-        for (size_t i = 0; i < address_bytes.size(); i++) {
-            connection->data()[i + 4] = address_bytes[i];
-        }
-
-        memcpy(&connection->data()[address_bytes.size() + 4], &port, 2);
-
-        if (!ec) {
-            std::cout << "Proxy connected to server " << remote_socket->remote_endpoint() << " successfully" << std::endl;
-
-            async_write(connection->getSocket(), buffer(connection->data(), address_bytes.size() + 6), 
-                    bind(&Socks5Proxy::startDataTransfer, this, _1, _2, connection, remote_socket));
-        }
-        else {
-            std::cout << ec.message() << std::endl;
-            async_write(connection->getSocket(), buffer(connection->data(), address_bytes.size() + 6), bind(&ConnectionPool::addConnection, &this->connection_pool, connection));
-        }
+    if (!ec) {
+        std::cout << "Connected to remote server " << remote_socket->remote_endpoint() << std::endl;
+        async_write(connection->getSocket(), buffer(connection->toServerBuf(), address_bytes.size() + 6), 
+                bind(&Socks5Proxy::startDataTransfer, this, _1, _2, connection, remote_socket));
+    }
+    else {
+        std::cout << "Connection to server has been failed. Reason: " << ec.message() << std::endl;
+        async_write(connection->getSocket(), buffer(connection->toServerBuf(), address_bytes.size() + 6), bind(&ConnectionPool::addConnection, &this->connection_pool, connection));
     }
 }
 
 void Socks5Proxy::startDataTransfer(const error_code& ec, std::size_t, std::shared_ptr<Connection> connection, std::shared_ptr<tcp::socket> remote_socket) {
     try {
         if (!ec) {
-            connection->getSocket().async_read_some(buffer(connection->data(), max_length), bind(&Socks5Proxy::sendDataToServer, this, _1, _2, connection, remote_socket));
-            remote_socket->async_read_some(buffer(connection->recv_data(), max_length), bind(&Socks5Proxy::sendDataToClient, this, _1, _2, connection, remote_socket));
+            connection->getSocket().async_read_some(buffer(connection->toServerBuf(), max_length), bind(&Socks5Proxy::sendDataToServer, this, _1, _2, connection, remote_socket));
+            remote_socket->async_read_some(buffer(connection->toClientBuf(), max_length), bind(&Socks5Proxy::sendDataToClient, this, _1, _2, connection, remote_socket));
         }
         else {
             connection_pool.addConnection(connection);
@@ -260,44 +207,12 @@ void Socks5Proxy::startDataTransfer(const error_code& ec, std::size_t, std::shar
     }
 }
 
-//
-void Socks5Proxy::recvDataFromClient(const error_code& ec, std::size_t, std::shared_ptr<Connection> connection, std::shared_ptr<tcp::socket> remote_socket) {
-    try {
-        if (!ec) {
-            connection->getSocket().async_read_some(buffer(connection->data(), max_length), bind(&Socks5Proxy::sendDataToServer, this, _1, _2, connection, remote_socket));
-        }
-        else {
-            connection_pool.addConnection(connection);
-            if (remote_socket->is_open()) {
-                remote_socket->shutdown(tcp::socket::shutdown_both);
-                remote_socket->close();
-            }
-        }
-    }
-    catch(system_error& e) {}
-}
-
-void Socks5Proxy::recvDataFromServer(const error_code& ec, std::size_t, std::shared_ptr<Connection> connection, std::shared_ptr<tcp::socket> remote_socket) {
-    try {
-        if (!ec) {
-            remote_socket->async_read_some(buffer(connection->recv_data(), max_length), bind(&Socks5Proxy::sendDataToClient, this, _1, _2, connection, remote_socket));
-        } 
-        else {
-            connection_pool.addConnection(connection);
-            if (remote_socket->is_open()) {
-                remote_socket->shutdown(tcp::socket::shutdown_both);
-                remote_socket->close();
-            }
-        }
-    }
-    catch(system_error& e) {}
-}
-
-//
+// тут
 void Socks5Proxy::sendDataToServer(const error_code& ec, std::size_t length, std::shared_ptr<Connection> connection, std::shared_ptr<tcp::socket> remote_socket) {
     try {
         if (!ec) {
-            remote_socket->async_write_some(buffer(connection->data(), length), bind(&Socks5Proxy::recvDataFromClient, this, _1, _2, connection, remote_socket));
+            // remote_socket->async_write_some(buffer(connection->toServerBuf(), length), bind(&Socks5Proxy::recvDataFromClient, this, _1, _2, connection, remote_socket));
+            async_write(*remote_socket, buffer(connection->toServerBuf(), length), bind(&Socks5Proxy::recvDataFromClient, this, _1, _2, connection, remote_socket));
         }
         else {
             connection_pool.addConnection(connection);
@@ -313,7 +228,8 @@ void Socks5Proxy::sendDataToServer(const error_code& ec, std::size_t length, std
 void Socks5Proxy::sendDataToClient(const error_code& ec, std::size_t length, std::shared_ptr<Connection> connection, std::shared_ptr<tcp::socket> remote_socket) {
     try {
         if (!ec) {
-            connection->getSocket().async_write_some(buffer(connection->recv_data(), length), bind(&Socks5Proxy::recvDataFromServer, this, _1, _2, connection, remote_socket));
+            // connection->getSocket().async_write_some(buffer(connection->toClientBuf(), length), bind(&Socks5Proxy::recvDataFromServer, this, _1, _2, connection, remote_socket));
+            async_write(connection->getSocket(), buffer(connection->toClientBuf(), length), bind(&Socks5Proxy::recvDataFromServer, this, _1, _2, connection, remote_socket));
         }
         else {
             connection_pool.addConnection(connection);
@@ -325,3 +241,37 @@ void Socks5Proxy::sendDataToClient(const error_code& ec, std::size_t length, std
     }
     catch (system_error& e) {}
 }
+
+// тут
+void Socks5Proxy::recvDataFromClient(const error_code& ec, std::size_t, std::shared_ptr<Connection> connection, std::shared_ptr<tcp::socket> remote_socket) {
+    try {
+        if (!ec) {
+            connection->getSocket().async_read_some(buffer(connection->toServerBuf(), max_length), bind(&Socks5Proxy::sendDataToServer, this, _1, _2, connection, remote_socket));
+        }
+        else {
+            connection_pool.addConnection(connection);
+            if (remote_socket->is_open()) {
+                remote_socket->shutdown(tcp::socket::shutdown_both);
+                remote_socket->close();
+            }
+        }
+    }
+    catch(system_error& e) {}
+}
+
+void Socks5Proxy::recvDataFromServer(const error_code& ec, std::size_t, std::shared_ptr<Connection> connection, std::shared_ptr<tcp::socket> remote_socket) {
+    try {
+        if (!ec) {
+            remote_socket->async_read_some(buffer(connection->toClientBuf(), max_length), bind(&Socks5Proxy::sendDataToClient, this, _1, _2, connection, remote_socket));
+        } 
+        else {
+            connection_pool.addConnection(connection);
+            if (remote_socket->is_open()) {
+                remote_socket->shutdown(tcp::socket::shutdown_both);
+                remote_socket->close();
+            }
+        }
+    }
+    catch(system_error& e) {}
+}
+
