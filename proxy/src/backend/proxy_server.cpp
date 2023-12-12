@@ -123,7 +123,7 @@ void Socks5Proxy::getDomainLength(const error_code& ec, std::size_t length, std:
         memcpy(&name_length, &connection->toServerBuf()[0], 1);
         std::cout << "Domain name length: " << name_length << std::endl;
 
-        async_read(connection->getSocket(), buffer(connection->toServerBuf(), name_length), bind(&Socks5Proxy::getDomainName, this, _1, _2, connection));
+        async_read(connection->getSocket(), buffer(connection->toServerBuf(), name_length + 2), bind(&Socks5Proxy::getDomainName, this, _1, _2, connection));
     }
     else {
         std::cerr << "Get domain length error: " << ec.message() << std::endl;
@@ -133,8 +133,27 @@ void Socks5Proxy::getDomainLength(const error_code& ec, std::size_t length, std:
 
 void Socks5Proxy::getDomainName(const error_code& ec, std::size_t length, std::shared_ptr<Connection> connection) {
     if (!ec) {
-        std::cout << "Domain name length: " << length << std::endl;
-        // std::cout << "Domain name: " << buffer_data << std::endl;
+        std::cout << "Domain name and port length: " << length << std::endl;
+
+        std::vector<char> host_name(length - 2);
+        for (size_t i = 0; i < length - 2; ++i) {
+            host_name[i] = static_cast<char>(connection->toServerBuf()[i]);
+        }
+
+        uint16_t dest_port;
+        memcpy(&dest_port, &connection->toServerBuf()[length-2], 2);
+        dest_port = ntohs(dest_port);
+
+        if (resolved_hosts[std::string(host_name.data(), length - 2)] != ip::make_address_v4("0.0.0.0")) {
+            tcp::endpoint(this->resolved_hosts[std::string(host_name.data(), length - 2)], dest_port);
+        }
+        tcp::resolver resolver(io_ctx);
+        tcp::resolver::query query{std::string(host_name.data(), length - 2), std::to_string(dest_port)};
+        // std::cout << std::string(host_name.data(), length - 2) << ' ' << dest_port << std::endl;
+        // resolver.async_resolve(tcp::v4() ,query, );
+        //     tcp::endpoint endpoint = *it;
+        //     resolved_hosts[std::string(host_name.data(), length - 2)] = endpoint.address().to_v4();
+        std::cout << "Coming soon" << std::endl;
     }
     else {
         std::cerr << "Domain resolve error: " << ec.message() << std::endl;
@@ -207,11 +226,9 @@ void Socks5Proxy::startDataTransfer(const error_code& ec, std::size_t, std::shar
     }
 }
 
-// тут
 void Socks5Proxy::sendDataToServer(const error_code& ec, std::size_t length, std::shared_ptr<Connection> connection, std::shared_ptr<tcp::socket> remote_socket) {
     try {
         if (!ec) {
-            // remote_socket->async_write_some(buffer(connection->toServerBuf(), length), bind(&Socks5Proxy::recvDataFromClient, this, _1, _2, connection, remote_socket));
             async_write(*remote_socket, buffer(connection->toServerBuf(), length), bind(&Socks5Proxy::recvDataFromClient, this, _1, _2, connection, remote_socket));
         }
         else {
@@ -228,7 +245,6 @@ void Socks5Proxy::sendDataToServer(const error_code& ec, std::size_t length, std
 void Socks5Proxy::sendDataToClient(const error_code& ec, std::size_t length, std::shared_ptr<Connection> connection, std::shared_ptr<tcp::socket> remote_socket) {
     try {
         if (!ec) {
-            // connection->getSocket().async_write_some(buffer(connection->toClientBuf(), length), bind(&Socks5Proxy::recvDataFromServer, this, _1, _2, connection, remote_socket));
             async_write(connection->getSocket(), buffer(connection->toClientBuf(), length), bind(&Socks5Proxy::recvDataFromServer, this, _1, _2, connection, remote_socket));
         }
         else {
@@ -242,7 +258,6 @@ void Socks5Proxy::sendDataToClient(const error_code& ec, std::size_t length, std
     catch (system_error& e) {}
 }
 
-// тут
 void Socks5Proxy::recvDataFromClient(const error_code& ec, std::size_t, std::shared_ptr<Connection> connection, std::shared_ptr<tcp::socket> remote_socket) {
     try {
         if (!ec) {

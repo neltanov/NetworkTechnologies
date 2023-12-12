@@ -21,6 +21,7 @@ private:
     io_context io_ctx;
     tcp::acceptor client_acceptor;
     ConnectionPool connection_pool;
+    std::map<std::string, ip::address_v4> resolved_hosts;
 
     static const int max_length = 8192;
 
@@ -34,8 +35,6 @@ private:
     void handleAddress(const error_code& ec, std::size_t length, std::shared_ptr<Connection> connection);
 
     void readIPv4Address(const error_code& ec, std::size_t length, std::shared_ptr<Connection> connection);
-    void readIPv6Address(const error_code& ec, std::size_t length, std::shared_ptr<Connection> connection);
-
     void getDomainLength(const error_code& ec, std::size_t length, std::shared_ptr<Connection> connection);
     void getDomainName(const error_code& ec, std::size_t length, std::shared_ptr<Connection> connection);
 
