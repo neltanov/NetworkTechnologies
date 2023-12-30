@@ -134,7 +134,7 @@ void Socks5Proxy::getDomainLength(const error_code& ec, std::size_t length, std:
 void Socks5Proxy::getDomainName(const error_code& ec, std::size_t length, std::shared_ptr<Connection> connection) {
     if (!ec) {
         std::cout << "Domain name and port length: " << length << std::endl;
-
+        
         std::vector<char> host_name(length - 2);
         for (size_t i = 0; i < length - 2; ++i) {
             host_name[i] = static_cast<char>(connection->toServerBuf()[i]);
